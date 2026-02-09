@@ -110,7 +110,6 @@ export default function About() {
                   />
                 </div>
 
-                {/* Animated SVG Border Ring */}
                 <svg
                   viewBox="0 0 100 100"
                   className="absolute inset-0 w-full h-full -rotate-90 z-20 pointer-events-none"
@@ -174,7 +173,7 @@ export default function About() {
 
             <h3 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 leading-[1.1]">
               Crafting clarity from <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700">
                 Mathematical Chaos.
               </span>
             </h3>

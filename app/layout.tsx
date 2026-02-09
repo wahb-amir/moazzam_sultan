@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     siteName: "Moazzam Sultan Portfolio",
     images: [
       {
-        url: "https://www.moazzamsultan.com/hero-image.jpg",
+        url: "https://www.moazzamsultan.com/og-image.png",
         width: 1200,
         height: 630,
         alt: "Moazzam Sultan teaching mathematics online",

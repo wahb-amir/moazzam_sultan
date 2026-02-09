@@ -1,17 +1,46 @@
 // src/components/Hero.jsx
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Play, ChevronDown } from "lucide-react";
 import { SOCIAL_LINKS } from "../data";
 
+
+const MATH_SYMBOLS = [
+  // Basic & Calculus
+  "∫₀ⁿ f(x)dx", "∑ᵢ₌₁ⁿ xᵢ", "π", "√x", "e=mc²", "sin(θ)", "cos(2θ)", 
+  "dy/dx", "∞", "∂u/∂t", "∇f", "limₓ→∞", "∫∫_D",
+  // Algebra & Sets
+  "x = \frac{-b ± √b²-4ac}{2a}", "A ∩ B", "∀x ∈ ℝ", "∃y", "f: A → B", 
+  "log₁₀(x)", "矩阵", "λ", "Δ", "Matrices", "x² + y² = r²",
+  // Geometry & Logic
+  "θ", "α + β + γ = 180°", "∴", "∵", "≡"
+];
 const Hero = () => {
+  // 2. State to hold our particles (generated on client-side to match hydration)
+  const [particles, setParticles] = useState([]);
+
+  useEffect(() => {
+    const particleCount = 14;
+    const newParticles = Array.from({ length: particleCount }).map((_, i) => ({
+      id: i,
+      symbol: MATH_SYMBOLS[Math.floor(Math.random() * MATH_SYMBOLS.length)],
+      left: Math.floor(Math.random() * 100), // Random horizontal position %
+      duration: Math.floor(Math.random() * 10) + 10, // Slow fall (10-20s)
+      delay: Math.floor(Math.random() * 5), // Random start delay
+      size: Math.floor(Math.random() * 20) + 14, // Random font size
+      rotation: Math.floor(Math.random() * 360), // Random start rotation
+    }));
+    setParticles(newParticles);
+  }, []);
+
   return (
     <section
       id="hero"
       className="relative h-screen w-full overflow-hidden flex items-center justify-center"
     >
-      <div className="absolute inset-0 w-full h-full bg-slate-900">
+      {/* Background Video Layer */}
+      <div className="absolute inset-0 w-full h-full bg-slate-900 z-0">
         <video
           autoPlay
           muted
@@ -28,6 +57,39 @@ const Hero = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-slate-900/40 to-slate-900/90" />
       </div>
 
+      {/* 3. The Falling Math Particles Layer (z-index 5: above bg, below text) */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-5">
+        {particles.map((particle) => (
+          <motion.div
+            key={particle.id}
+            initial={{ 
+              y: -100, 
+              opacity: 0, 
+              rotate: particle.rotation 
+            }}
+            animate={{ 
+              y: "110vh", // Fall through the bottom
+              opacity: [0, 1, 0.5, 0], // Fade in then out
+              rotate: particle.rotation + 360 // Tumble effect
+            }}
+            transition={{
+              duration: particle.duration,
+              repeat: Infinity,
+              ease: "linear",
+              delay: particle.delay,
+            }}
+            className="absolute text-white/50 font-serif font-bold select-none blur-[1px]"
+            style={{
+              left: `${particle.left}%`,
+              fontSize: `${particle.size}px`,
+            }}
+          >
+            {particle.symbol}
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Main Content Layer (z-index 10) */}
       <div className="relative z-10 container mx-auto px-6 text-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -71,7 +133,7 @@ const Hero = () => {
                   console.error("contact section not found");
                 }
               }}
-              className="px-8 py-4 bg-blue-600 text-white font-bold rounded-full flex items-center gap-2 shadow-xl hover:bg-blue-700 transition-colors min-w-[180px] justify-center"
+              className="px-8 py-4 bg-blue-600 text-white font-bold rounded-full flex items-center gap-2 shadow-xl hover:bg-blue-700 transition-colors min-w-[180px] justify-center cursor-pointer"
             >
               Contact Me
             </motion.a>
@@ -83,7 +145,7 @@ const Hero = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5, duration: 1 }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/50 animate-bounce"
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/50 animate-bounce z-10"
       >
         <ChevronDown size={32} />
       </motion.div>

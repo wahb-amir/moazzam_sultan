@@ -24,3 +24,32 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ===== Modern Thin Light Scrollbar ===== */
+
+/* Webkit Browsers (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 8px;               /* Thin scrollbar */
+  height: 8px;              /* Horizontal scrollbar thin too */
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;      /* Light background for the track */
+  border-radius: 4px;       /* Rounded edges */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #60a5fa;      /* Blue thumb */
+  border-radius: 4px;       /* Rounded corners */
+  transition: background 0.3s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3b82f6;      /* Darker blue on hover */
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;        /* Makes it thin */
+  scrollbar-color: #60a5fa #f1f5f9; /* thumb color / track color */
+}

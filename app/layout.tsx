@@ -73,7 +73,7 @@ const jsonLd = {
   ],
   alumniOf: {
     "@type": "CollegeOrUniversity",
-    name: "University of Lahore", // Corrected typo from "Lour"
+    name: "University of Lahore", 
   },
   knowsAbout: [
     "Mathematics",

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom"; // Added for Portal
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Play,
@@ -61,17 +62,22 @@ const PORTFOLIO_ITEMS = [
 const Portfolio = () => {
   const [filter, setFilter] = useState("all");
   const [selectedItem, setSelectedItem] = useState(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   const getYouTubeId = (url) => {
-    const regExp =
-      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url?.match(regExp);
     return match && match[2].length === 11 ? match[2] : null;
   };
 
   const getThumbnail = (item) => {
     const id = getYouTubeId(item.videoUrl);
-    return id
+    return id 
       ? `https://img.youtube.com/vi/${id}/hqdefault.jpg`
       : "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?q=80&w=800";
   };
@@ -82,7 +88,11 @@ const Portfolio = () => {
       : PORTFOLIO_ITEMS.filter((item) => item.type === filter);
 
   useEffect(() => {
-    document.body.style.overflow = selectedItem ? "hidden" : "unset";
+    if (selectedItem) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
   }, [selectedItem]);
 
   return (
@@ -120,7 +130,7 @@ const Portfolio = () => {
           {[
             { id: "all", label: "Everything" },
             { id: "intro", label: "About Me" },
-            { id: "video", label: "Full Lessons" },
+            { id: "video", label: "Full Lessons" }
           ].map((f) => (
             <button
               key={f.id}
@@ -137,10 +147,7 @@ const Portfolio = () => {
         </div>
 
         {/* Portfolio Grid */}
-        <motion.div
-          layout
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-        >
+        <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <AnimatePresence mode="popLayout">
             {filteredItems.map((item) => (
               <motion.div
@@ -149,7 +156,7 @@ const Portfolio = () => {
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.98 }}
-                whileHover={{ y: -5 }} // Reduced hover vertical movement
+                whileHover={{ y: -5 }}
                 className="group relative bg-white rounded-[2rem] overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
                 onClick={() => setSelectedItem(item)}
               >
@@ -157,10 +164,9 @@ const Portfolio = () => {
                   <img
                     src={getThumbnail(item)}
                     alt={item.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" // Subtle image zoom
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
-
                   <div className="absolute bottom-4 left-4">
                     <span className="flex items-center gap-1 px-3 py-1 bg-black/40 backdrop-blur-md text-white text-[10px] font-bold rounded-lg border border-white/10">
                       <Clock size={12} /> {item.duration}
@@ -182,32 +188,19 @@ const Portfolio = () => {
               </motion.div>
             ))}
 
-            {/* "Explore More" Final Card */}
             {filter === "all" && (
               <motion.a
                 layout
                 href="https://www.youtube.com/@iammoazzamsultan"
                 target="_blank"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                whileHover={{ y: -5 }}
                 className="group flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2rem] hover:border-blue-300 hover:bg-blue-50/30 transition-all duration-300"
               >
                 <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-md mb-4 group-hover:scale-110 transition-transform">
                   <Youtube className="text-red-600" size={32} />
                 </div>
-                <h4 className="text-xl font-extrabold text-slate-900 mb-2">
-                  Explore More
-                </h4>
-                <p className="text-slate-500 text-sm text-center mb-6">
-                  Access 100+ more lessons on my YouTube channel.
-                </p>
+                <h4 className="text-xl font-extrabold text-slate-900 mb-2">Explore More</h4>
                 <div className="flex items-center gap-2 text-blue-600 font-bold text-sm">
-                  Visit Channel{" "}
-                  <ArrowRight
-                    size={16}
-                    className="group-hover:translate-x-1 transition-transform"
-                  />
+                  Visit Channel <ArrowRight size={16} />
                 </div>
               </motion.a>
             )}
@@ -215,75 +208,82 @@ const Portfolio = () => {
         </motion.div>
       </div>
 
-      {/* Modal View */}
-      <AnimatePresence>
-        {selectedItem && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4"
-            onClick={() => setSelectedItem(null)}
-          >
+      {/* PORTAL MODAL VIEW */}
+      {mounted && createPortal(
+        <AnimatePresence>
+          {selectedItem && (
             <motion.div
-              initial={{ scale: 0.98, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.98, opacity: 0 }}
-              className="bg-white w-full max-w-5xl rounded-[2.5rem] overflow-hidden shadow-2xl relative"
-              onClick={(e) => e.stopPropagation()}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[9999] bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-0 md:p-6"
+              onClick={() => setSelectedItem(null)}
             >
-              <button
-                onClick={() => setSelectedItem(null)}
-                className="absolute top-6 right-6 z-[110] p-3 bg-slate-100 hover:bg-red-50 hover:text-red-600 text-slate-500 rounded-full transition-all"
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                className="bg-white w-full max-w-6xl h-full md:h-auto md:max-h-[90vh] md:rounded-[2.5rem] overflow-hidden shadow-2xl relative flex flex-col lg:flex-row"
+                onClick={(e) => e.stopPropagation()}
               >
-                <X size={24} />
-              </button>
+                {/* Close Button - Higher Z Index */}
+                <button
+                  onClick={() => setSelectedItem(null)}
+                  className="absolute top-4 right-4 z-[10001] p-3 bg-white/90 md:bg-slate-100 hover:bg-red-50 hover:text-red-600 text-slate-500 rounded-full shadow-lg transition-all"
+                >
+                  <X size={20} />
+                </button>
 
-              <div className="flex flex-col lg:flex-row h-full">
-                <div className="lg:w-2/3 bg-black aspect-video">
-                  <iframe
-                    src={`https://www.youtube.com/embed/${getYouTubeId(selectedItem.videoUrl)}?autoplay=1`}
-                    className="w-full h-full"
-                    allow="autoplay; encrypted-media"
-                    allowFullScreen
-                  ></iframe>
+                {/* Media Side - Stays Top on Mobile */}
+                <div className="w-full lg:w-[65%] bg-black flex items-center">
+                  <div className="w-full aspect-video">
+                    <iframe
+                      src={`https://www.youtube.com/embed/${getYouTubeId(selectedItem.videoUrl)}?autoplay=1`}
+                      className="w-full h-full"
+                      allow="autoplay; encrypted-media"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
                 </div>
 
-                <div className="lg:w-1/3 p-10 flex flex-col justify-between">
-                  <div>
+                {/* Content Side - Scrollable on Mobile */}
+                <div className="w-full lg:w-[35%] p-6 md:p-10 overflow-y-auto flex flex-col">
+                  <div className="flex-1">
                     <span className="inline-block px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-md mb-4">
                       {selectedItem.category}
                     </span>
-                    <h3 className="text-2xl font-extrabold text-slate-900 mb-4">
+                    <h3 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-4 leading-tight">
                       {selectedItem.title}
                     </h3>
-                    <p className="text-slate-600 text-sm leading-relaxed mb-6">
+                    <p className="text-slate-600 text-sm md:text-base leading-relaxed mb-6">
                       {selectedItem.description}
                     </p>
-                    <div className="flex flex-wrap gap-2">
+                    
+                    <div className="flex flex-wrap gap-2 mb-8">
                       {selectedItem.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100"
-                        >
+                        <span key={tag} className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">
                           <Tag size={10} /> {tag}
                         </span>
                       ))}
                     </div>
                   </div>
-                  <a
-                    href={selectedItem.videoUrl}
-                    target="_blank"
-                    className="mt-8 flex items-center justify-center gap-3 w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-red-600 transition-all"
-                  >
-                    Watch on YouTube <ExternalLink size={18} />
-                  </a>
+
+                  <div className="mt-auto pt-6 border-t border-slate-100">
+                    <a
+                      href={selectedItem.videoUrl}
+                      target="_blank"
+                      className="flex items-center justify-center gap-3 w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-blue-600 transition-all shadow-lg"
+                    >
+                      Watch on YouTube <ExternalLink size={18} />
+                    </a>
+                  </div>
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </section>
   );
 };

@@ -16,44 +16,35 @@ const PORTFOLIO_ITEMS = [
   {
     id: 1,
     type: "video",
-    title: "10th Class Math - Exercise 1.1 | Quadratic Equations",
+    title: "Exercise 6.1 | Class 9 Maths New Book 2025 | PCTB Chapter 6 ",
     category: "Punjab Board",
-    videoUrl: "https://www.youtube.com/watch?v=q668W2-W_K8",
-    duration: "15:20",
-    tags: ["Algebra", "Matric"],
+    videoUrl: "https://www.youtube.com/watch?v=AOkiRMqhDDw",
+    duration: "1:04:09",
+    tags: ["Class 9"],
     description:
       "Step-by-step solution for Quadratic Equations following the Punjab Curriculum and Textbook Board.",
   },
   {
     id: 2,
     type: "video",
-    title: "Cambridge O Level Math | D2 Exercise 7A | Trigonometry",
-    category: "Cambridge O-Levels",
-    videoUrl: "https://www.youtube.com/watch?v=ExampleID1", // Replace with real IDs as needed
-    duration: "22:10",
-    tags: ["Trigonometry", "D2 Series"],
+    title: "IGCSE Maths 0580 Paper 2 (Extended) Solved | Feb/March 2025 | With Explanation",
+    category: "Cambridge IGCSE",
+    videoUrl: "https://youtu.be/tsCgH-Pqdl8?si=O8O5Yj3jozZv1QQo", 
+    duration: "1:51:21",
+    tags: [],
     description:
       "Mastering Sine and Cosine rules with Cambridge topical past paper examples.",
   },
   {
     id: 3,
     type: "video",
-    title: "How to use Graphic Tablet for Online Teaching",
+    title: "Exercise 1.2 | Class 9 Maths New Book 2025 | PCTB Chapter 1 Solutions",
     category: "Achievement",
-    videoUrl: "https://www.youtube.com/watch?v=ExampleID2",
-    duration: "08:45",
-    tags: ["EdTech", "Online Classes"],
+    videoUrl: "https://youtu.be/8VyvRs1yBuc?si=5PCUoqBEJLaGb8aZ",
+    duration: "2:11:55",
+    tags: [],
     description:
       "A look into my interactive setup using a stylus and digital whiteboard for clear learning.",
-  },
-  {
-    id: 4,
-    type: "achievement",
-    title: "Master's Degree in Mathematics",
-    category: "Education",
-    src: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=800",
-    description:
-      "Completed MSc in Mathematics with a focus on advanced pedagogical techniques.",
   },
 ];
 

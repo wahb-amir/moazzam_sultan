@@ -7,44 +7,54 @@ import {
   X,
   ExternalLink,
   Tag,
-  BookOpen,
   Clock,
+  ArrowRight,
 } from "lucide-react";
 
-// Real Data from Moazzam Sultan's Channel
 const PORTFOLIO_ITEMS = [
   {
     id: 1,
-    type: "video",
-    title: "Exercise 6.1 | Class 9 Maths New Book 2025 | PCTB Chapter 6 ",
-    category: "Punjab Board",
-    videoUrl: "https://www.youtube.com/watch?v=AOkiRMqhDDw",
-    duration: "1:04:09",
-    tags: ["Class 9"],
+    type: "intro",
+    title: "Meet Your Instructor: Moazzam Sultan",
+    category: "Introduction",
+    videoUrl: "https://youtu.be/2oPoVJV4APY",
+    duration: "0:59",
+    tags: ["Philosophy", "Methodology", "Experience"],
     description:
-      "Step-by-step solution for Quadratic Equations following the Punjab Curriculum and Textbook Board.",
+      "A brief look into my background, teaching style, and how I use digital tools to make complex mathematics easy to understand.",
   },
   {
     id: 2,
     type: "video",
-    title: "IGCSE Maths 0580 Paper 2 (Extended) Solved | Feb/March 2025 | With Explanation",
+    title: "IGCSE Math: 2025 Paper 2 Walkthrough",
     category: "Cambridge IGCSE",
-    videoUrl: "https://youtu.be/tsCgH-Pqdl8?si=O8O5Yj3jozZv1QQo", 
+    videoUrl: "https://youtu.be/tsCgH-Pqdl8",
     duration: "1:51:21",
-    tags: [],
+    tags: ["IGCSE", "Past Papers", "Exam Prep"],
     description:
-      "Mastering Sine and Cosine rules with Cambridge topical past paper examples.",
+      "A comprehensive, step-by-step solution of the latest IGCSE Extended Paper, focusing on exam techniques and time management.",
   },
   {
     id: 3,
     type: "video",
-    title: "Exercise 1.2 | Class 9 Maths New Book 2025 | PCTB Chapter 1 Solutions",
-    category: "Achievement",
-    videoUrl: "https://youtu.be/8VyvRs1yBuc?si=5PCUoqBEJLaGb8aZ",
+    title: "The Art of Rationalizing Surds",
+    category: "Matric (Class 9)",
+    videoUrl: "https://youtu.be/8VyvRs1yBuc",
     duration: "2:11:55",
-    tags: [],
+    tags: ["Algebra", "Radicals", "Rationalization"],
     description:
-      "A look into my interactive setup using a stylus and digital whiteboard for clear learning.",
+      "Mastering the concept of surds and binomial denominators. I explain the logic behind rationalizing to simplify complex fractions.",
+  },
+  {
+    id: 4,
+    type: "video",
+    title: "Understanding Angles & Geometry Basics",
+    category: "Matric (Class 9)",
+    videoUrl: "https://www.youtube.com/watch?v=AOkiRMqhDDw",
+    duration: "1:04:09",
+    tags: ["Geometry", "Quadrants", "Trigonometry"],
+    description:
+      "Exploring the fundamentals of angles, including quadrants and coterminal concepts, along with practical geometric applications.",
   },
 ];
 
@@ -52,7 +62,6 @@ const Portfolio = () => {
   const [filter, setFilter] = useState("all");
   const [selectedItem, setSelectedItem] = useState(null);
 
-  // Extract YouTube ID and get high-quality thumbnail
   const getYouTubeId = (url) => {
     const regExp =
       /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
@@ -61,21 +70,16 @@ const Portfolio = () => {
   };
 
   const getThumbnail = (item) => {
-    if (item.type === "video") {
-      const id = getYouTubeId(item.videoUrl);
-      return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
-    }
-    return item.src;
+    const id = getYouTubeId(item.videoUrl);
+    return id
+      ? `https://img.youtube.com/vi/${id}/hqdefault.jpg`
+      : "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?q=80&w=800";
   };
 
   const filteredItems =
     filter === "all"
       ? PORTFOLIO_ITEMS
-      : PORTFOLIO_ITEMS.filter(
-          (item) =>
-            item.type === filter ||
-            (filter === "video" && item.type === "video"),
-        );
+      : PORTFOLIO_ITEMS.filter((item) => item.type === filter);
 
   useEffect(() => {
     document.body.style.overflow = selectedItem ? "hidden" : "unset";
@@ -84,7 +88,7 @@ const Portfolio = () => {
   return (
     <section id="portfolio" className="py-24 bg-white">
       <div className="container mx-auto px-6">
-        {/* Section Heading */}
+        {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -92,23 +96,19 @@ const Portfolio = () => {
             viewport={{ once: true }}
           >
             <h2 className="text-sm font-bold text-blue-600 tracking-[0.2em] uppercase mb-4">
-              Masterclass Library
+              Learning Library
             </h2>
             <h3 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight">
               Interactive <span className="text-blue-600">Tutorials</span>
             </h3>
-            <p className="text-slate-500 mt-4 text-lg max-w-xl">
-              Real sessions from my YouTube channel covering Punjab Board and
-              Cambridge Mathematics.
-            </p>
           </motion.div>
 
           <motion.a
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             href="https://www.youtube.com/@iammoazzamsultan"
             target="_blank"
-            className="flex items-center gap-3 px-8 py-4 bg-red-600 text-white rounded-2xl font-bold shadow-2xl shadow-red-200 hover:bg-red-700 transition-all"
+            className="flex items-center gap-3 px-8 py-4 bg-red-600 text-white rounded-2xl font-bold shadow-xl hover:bg-red-700 transition-all"
           >
             <Youtube size={24} />
             Visit My Channel
@@ -117,17 +117,21 @@ const Portfolio = () => {
 
         {/* Filter Navigation */}
         <div className="flex gap-4 mb-12 overflow-x-auto pb-4 no-scrollbar">
-          {["all", "video", "achievement"].map((f) => (
+          {[
+            { id: "all", label: "Everything" },
+            { id: "intro", label: "About Me" },
+            { id: "video", label: "Full Lessons" },
+          ].map((f) => (
             <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-8 py-3 rounded-2xl text-sm font-bold capitalize transition-all border ${
-                filter === f
-                  ? "bg-slate-900 text-white border-slate-900 shadow-xl"
-                  : "bg-white text-slate-500 border-slate-100 hover:border-blue-200 hover:text-blue-600"
+              key={f.id}
+              onClick={() => setFilter(f.id)}
+              className={`px-8 py-3 rounded-2xl text-sm font-bold transition-all border whitespace-nowrap ${
+                filter === f.id
+                  ? "bg-slate-900 text-white border-slate-900 shadow-lg"
+                  : "bg-white text-slate-500 border-slate-100 hover:border-blue-200"
               }`}
             >
-              {f === "all" ? "Everything" : f + "s"}
+              {f.label}
             </button>
           ))}
         </div>
@@ -142,46 +146,32 @@ const Portfolio = () => {
               <motion.div
                 layout
                 key={item.id}
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                whileHover={{ y: -10 }}
-                className="group relative bg-white rounded-[2rem] overflow-hidden border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500"
+                exit={{ opacity: 0, scale: 0.98 }}
+                whileHover={{ y: -5 }} // Reduced hover vertical movement
+                className="group relative bg-white rounded-[2rem] overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
                 onClick={() => setSelectedItem(item)}
               >
-                {/* Image Container */}
                 <div className="relative aspect-video overflow-hidden">
                   <img
                     src={getThumbnail(item)}
                     alt={item.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" // Subtle image zoom
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
 
-                  {/* Item Overlay Stats */}
-                  {item.type === "video" && (
-                    <div className="absolute bottom-4 left-4 flex gap-2">
-                      <span className="flex items-center gap-1 px-3 py-1 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold rounded-lg border border-white/20">
-                        <Clock size={12} /> {item.duration}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Centered Play Icon */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-2xl scale-50 group-hover:scale-100 transition-transform">
-                      <Play fill="currentColor" size={24} className="ml-1" />
-                    </div>
+                  <div className="absolute bottom-4 left-4">
+                    <span className="flex items-center gap-1 px-3 py-1 bg-black/40 backdrop-blur-md text-white text-[10px] font-bold rounded-lg border border-white/10">
+                      <Clock size={12} /> {item.duration}
+                    </span>
                   </div>
                 </div>
 
-                {/* Content */}
                 <div className="p-8">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 px-2 py-1 bg-blue-50 rounded">
-                      {item.category}
-                    </span>
-                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-3 block">
+                    {item.category}
+                  </span>
                   <h4 className="text-xl font-bold text-slate-900 mb-3 leading-tight group-hover:text-blue-600 transition-colors">
                     {item.title}
                   </h4>
@@ -191,24 +181,54 @@ const Portfolio = () => {
                 </div>
               </motion.div>
             ))}
+
+            {/* "Explore More" Final Card */}
+            {filter === "all" && (
+              <motion.a
+                layout
+                href="https://www.youtube.com/@iammoazzamsultan"
+                target="_blank"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                whileHover={{ y: -5 }}
+                className="group flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2rem] hover:border-blue-300 hover:bg-blue-50/30 transition-all duration-300"
+              >
+                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-md mb-4 group-hover:scale-110 transition-transform">
+                  <Youtube className="text-red-600" size={32} />
+                </div>
+                <h4 className="text-xl font-extrabold text-slate-900 mb-2">
+                  Explore More
+                </h4>
+                <p className="text-slate-500 text-sm text-center mb-6">
+                  Access 100+ more lessons on my YouTube channel.
+                </p>
+                <div className="flex items-center gap-2 text-blue-600 font-bold text-sm">
+                  Visit Channel{" "}
+                  <ArrowRight
+                    size={16}
+                    className="group-hover:translate-x-1 transition-transform"
+                  />
+                </div>
+              </motion.a>
+            )}
           </AnimatePresence>
         </motion.div>
       </div>
 
-      {/* Modern Video / Image Modal */}
+      {/* Modal View */}
       <AnimatePresence>
         {selectedItem && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-slate-900/90 backdrop-blur-xl flex items-center justify-center p-4"
+            className="fixed inset-0 z-[100] bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4"
             onClick={() => setSelectedItem(null)}
           >
             <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              initial={{ scale: 0.98, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.98, opacity: 0 }}
               className="bg-white w-full max-w-5xl rounded-[2.5rem] overflow-hidden shadow-2xl relative"
               onClick={(e) => e.stopPropagation()}
             >
@@ -220,67 +240,44 @@ const Portfolio = () => {
               </button>
 
               <div className="flex flex-col lg:flex-row h-full">
-                {/* Media Side */}
-                <div className="lg:w-2/3 bg-black aspect-video flex items-center justify-center">
-                  {selectedItem.type === "video" ? (
-                    <iframe
-                      src={`https://www.youtube.com/embed/${getYouTubeId(selectedItem.videoUrl)}?autoplay=1`}
-                      className="w-full h-full"
-                      allow="autoplay; encrypted-media"
-                      allowFullScreen
-                    ></iframe>
-                  ) : (
-                    <img
-                      src={selectedItem.src}
-                      className="w-full h-full object-contain"
-                    />
-                  )}
+                <div className="lg:w-2/3 bg-black aspect-video">
+                  <iframe
+                    src={`https://www.youtube.com/embed/${getYouTubeId(selectedItem.videoUrl)}?autoplay=1`}
+                    className="w-full h-full"
+                    allow="autoplay; encrypted-media"
+                    allowFullScreen
+                  ></iframe>
                 </div>
 
-                {/* Info Side */}
-                <div className="lg:w-1/3 p-8 md:p-12 flex flex-col justify-between">
+                <div className="lg:w-1/3 p-10 flex flex-col justify-between">
                   <div>
-                    <span className="inline-block px-4 py-1.5 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-full mb-6">
+                    <span className="inline-block px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-md mb-4">
                       {selectedItem.category}
                     </span>
-                    <h3 className="text-3xl font-extrabold text-slate-900 mb-6 leading-tight">
+                    <h3 className="text-2xl font-extrabold text-slate-900 mb-4">
                       {selectedItem.title}
                     </h3>
-                    <p className="text-slate-600 leading-relaxed mb-8">
+                    <p className="text-slate-600 text-sm leading-relaxed mb-6">
                       {selectedItem.description}
                     </p>
-
-                    {selectedItem.tags && (
-                      <div className="flex flex-wrap gap-2">
-                        {selectedItem.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="flex items-center gap-1.5 text-xs font-bold text-slate-400"
-                          >
-                            <Tag size={12} /> {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    <div className="flex flex-wrap gap-2">
+                      {selectedItem.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100"
+                        >
+                          <Tag size={10} /> {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-
-                  <div className="mt-12 space-y-4">
-                    <a
-                      href={
-                        selectedItem.videoUrl || "https://wa.me/923097016696"
-                      }
-                      target="_blank"
-                      className="flex items-center justify-center gap-3 w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-blue-600 transition-all group"
-                    >
-                      {selectedItem.type === "video"
-                        ? "Watch on YouTube"
-                        : "Inquire Now"}
-                      <ExternalLink
-                        size={18}
-                        className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
-                      />
-                    </a>
-                  </div>
+                  <a
+                    href={selectedItem.videoUrl}
+                    target="_blank"
+                    className="mt-8 flex items-center justify-center gap-3 w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-red-600 transition-all"
+                  >
+                    Watch on YouTube <ExternalLink size={18} />
+                  </a>
                 </div>
               </div>
             </motion.div>

@@ -1,9 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { createPortal } from "react-dom"; // Added for Portal
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Play,
   Youtube,
   X,
   ExternalLink,
@@ -21,8 +20,7 @@ const PORTFOLIO_ITEMS = [
     videoUrl: "https://youtu.be/2oPoVJV4APY",
     duration: "0:59",
     tags: ["Philosophy", "Methodology", "Experience"],
-    description:
-      "A brief look into my background, teaching style, and how I use digital tools to make complex mathematics easy to understand.",
+    description: "A brief look into my background, teaching style, and how I use digital tools to make complex mathematics easy to understand.",
   },
   {
     id: 2,
@@ -32,8 +30,7 @@ const PORTFOLIO_ITEMS = [
     videoUrl: "https://youtu.be/tsCgH-Pqdl8",
     duration: "1:51:21",
     tags: ["IGCSE", "Past Papers", "Exam Prep"],
-    description:
-      "A comprehensive, step-by-step solution of the latest IGCSE Extended Paper, focusing on exam techniques and time management.",
+    description: "A comprehensive, step-by-step solution of the latest IGCSE Extended Paper, focusing on exam techniques and time management.",
   },
   {
     id: 3,
@@ -43,8 +40,7 @@ const PORTFOLIO_ITEMS = [
     videoUrl: "https://youtu.be/8VyvRs1yBuc",
     duration: "2:11:55",
     tags: ["Algebra", "Radicals", "Rationalization"],
-    description:
-      "Mastering the concept of surds and binomial denominators. I explain the logic behind rationalizing to simplify complex fractions.",
+    description: "Mastering the concept of surds and binomial denominators. I explain the logic behind rationalizing to simplify complex fractions.",
   },
   {
     id: 4,
@@ -54,8 +50,7 @@ const PORTFOLIO_ITEMS = [
     videoUrl: "https://www.youtube.com/watch?v=AOkiRMqhDDw",
     duration: "1:04:09",
     tags: ["Geometry", "Quadrants", "Trigonometry"],
-    description:
-      "Exploring the fundamentals of angles, including quadrants and coterminal concepts, along with practical geometric applications.",
+    description: "Exploring the fundamentals of angles, including quadrants and coterminal concepts, along with practical geometric applications.",
   },
 ];
 
@@ -66,7 +61,17 @@ const Portfolio = () => {
 
   useEffect(() => {
     setMounted(true);
-    return () => setMounted(false);
+    
+    // Accessibility: Close on Escape key
+    const handleEsc = (e) => {
+      if (e.key === "Escape") setSelectedItem(null);
+    };
+    window.addEventListener("keydown", handleEsc);
+    
+    return () => {
+      setMounted(false);
+      window.removeEventListener("keydown", handleEsc);
+    };
   }, []);
 
   const getYouTubeId = (url) => {
@@ -82,17 +87,12 @@ const Portfolio = () => {
       : "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?q=80&w=800";
   };
 
-  const filteredItems =
-    filter === "all"
-      ? PORTFOLIO_ITEMS
-      : PORTFOLIO_ITEMS.filter((item) => item.type === filter);
+  const filteredItems = filter === "all"
+    ? PORTFOLIO_ITEMS
+    : PORTFOLIO_ITEMS.filter((item) => item.type === filter);
 
   useEffect(() => {
-    if (selectedItem) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
+    document.body.style.overflow = selectedItem ? "hidden" : "unset";
   }, [selectedItem]);
 
   return (
@@ -127,21 +127,17 @@ const Portfolio = () => {
 
         {/* Filter Navigation */}
         <div className="flex gap-4 mb-12 overflow-x-auto pb-4 no-scrollbar">
-          {[
-            { id: "all", label: "Everything" },
-            { id: "intro", label: "About Me" },
-            { id: "video", label: "Full Lessons" }
-          ].map((f) => (
+          {["all", "intro", "video"].map((type) => (
             <button
-              key={f.id}
-              onClick={() => setFilter(f.id)}
+              key={type}
+              onClick={() => setFilter(type)}
               className={`px-8 py-3 rounded-2xl text-sm font-bold transition-all border whitespace-nowrap ${
-                filter === f.id
+                filter === type
                   ? "bg-slate-900 text-white border-slate-900 shadow-lg"
                   : "bg-white text-slate-500 border-slate-100 hover:border-blue-200"
               }`}
             >
-              {f.label}
+              {type === "all" ? "Everything" : type === "intro" ? "About Me" : "Full Lessons"}
             </button>
           ))}
         </div>
@@ -216,25 +212,29 @@ const Portfolio = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[9999] bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-0 md:p-6"
-              onClick={() => setSelectedItem(null)}
+              className="fixed inset-0 z-[9999] bg-slate-900/98 backdrop-blur-xl flex items-center justify-center p-0 md:p-8"
+              onClick={() => setSelectedItem(null)} // Click overlay to close
             >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                className="bg-white w-full max-w-6xl h-full md:h-auto md:max-h-[90vh] md:rounded-[2.5rem] overflow-hidden shadow-2xl relative flex flex-col lg:flex-row"
-                onClick={(e) => e.stopPropagation()}
+              {/* IMPROVED CLOSE BUTTON: Outside container, high z-index */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedItem(null);
+                }}
+                className="fixed top-6 right-6 z-[10005] p-4 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all border border-white/20 shadow-2xl group"
+                aria-label="Close modal"
               >
-                {/* Close Button - Higher Z Index */}
-                <button
-                  onClick={() => setSelectedItem(null)}
-                  className="absolute top-4 right-4 z-[10001] p-3 bg-white/90 md:bg-slate-100 hover:bg-red-50 hover:text-red-600 text-slate-500 rounded-full shadow-lg transition-all"
-                >
-                  <X size={20} />
-                </button>
+                <X size={28} className="group-hover:rotate-90 transition-transform duration-300" />
+              </button>
 
-                {/* Media Side - Stays Top on Mobile */}
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0, y: 40 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: 40 }}
+                className="bg-white w-full max-w-6xl h-full md:h-auto md:max-h-[85vh] md:rounded-[3rem] overflow-hidden shadow-[0_32px_64px_-12px_rgba(0,0,0,0.5)] relative flex flex-col lg:flex-row"
+                onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+              >
+                {/* Video Section */}
                 <div className="w-full lg:w-[65%] bg-black flex items-center">
                   <div className="w-full aspect-video">
                     <iframe
@@ -246,35 +246,40 @@ const Portfolio = () => {
                   </div>
                 </div>
 
-                {/* Content Side - Scrollable on Mobile */}
-                <div className="w-full lg:w-[35%] p-6 md:p-10 overflow-y-auto flex flex-col">
+                {/* Info Section */}
+                <div className="w-full lg:w-[35%] p-8 md:p-12 overflow-y-auto flex flex-col bg-white">
                   <div className="flex-1">
-                    <span className="inline-block px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-md mb-4">
-                      {selectedItem.category}
-                    </span>
-                    <h3 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-4 leading-tight">
+                    <div className="flex items-center gap-2 mb-6">
+                       <span className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-lg">
+                        {selectedItem.category}
+                      </span>
+                    </div>
+                    
+                    <h3 className="text-2xl md:text-4xl font-black text-slate-900 mb-6 leading-[1.1]">
                       {selectedItem.title}
                     </h3>
-                    <p className="text-slate-600 text-sm md:text-base leading-relaxed mb-6">
+                    
+                    <p className="text-slate-600 text-base md:text-lg leading-relaxed mb-8">
                       {selectedItem.description}
                     </p>
                     
-                    <div className="flex flex-wrap gap-2 mb-8">
+                    <div className="flex flex-wrap gap-2 mb-10">
                       {selectedItem.tags.map((tag) => (
-                        <span key={tag} className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">
-                          <Tag size={10} /> {tag}
+                        <span key={tag} className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-xl">
+                          <Tag size={12} /> {tag}
                         </span>
                       ))}
                     </div>
                   </div>
 
-                  <div className="mt-auto pt-6 border-t border-slate-100">
+                  <div className="mt-auto pt-8 border-t border-slate-100">
                     <a
                       href={selectedItem.videoUrl}
                       target="_blank"
-                      className="flex items-center justify-center gap-3 w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-blue-600 transition-all shadow-lg"
+                      className="flex items-center justify-center gap-3 w-full py-5 bg-slate-900 text-white rounded-2xl font-bold hover:bg-blue-600 transition-all shadow-xl group"
                     >
-                      Watch on YouTube <ExternalLink size={18} />
+                      Watch on YouTube 
+                      <ExternalLink size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                     </a>
                   </div>
                 </div>

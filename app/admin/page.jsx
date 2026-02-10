@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
+import { useAuth } from "../providers/AuthProvider";
 import {
   Loader2,
   Layout,
@@ -14,8 +15,7 @@ import {
   AlertCircle,
   Undo2,
 } from "lucide-react";
-
-// Import Modular Components
+import { useRouter } from "next/navigation";
 import PreviewPanel from "../components/Preview";
 import {
   HeroEditor,
@@ -84,14 +84,26 @@ function generateDefaultSlots() {
   return slots;
 }
 export default function Dashboard() {
+  const {user}=useAuth()
   const [loading, setLoading] = useState(true);
   const [draft, setDraft] = useState(getEmptyDraft());
   const [versions, setVersions] = useState([]);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [message, setMessage] = useState([]);
+  const router= useRouter()
   const saveRef = useRef(null);
+  useEffect(() => {
+    if (!user) {
+      router.push("/");
+    }
+  }, [user, router]);
 
+  if (!user) return (
+      <div className="h-screen flex items-center justify-center">
+        <Loader2 className="animate-spin text-blue-600" />
+      </div>
+    );;
   useEffect(() => {
     async function load() {
       try {

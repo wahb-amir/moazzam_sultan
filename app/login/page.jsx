@@ -50,7 +50,7 @@ export default function ProfessionalLogin() {
       if (response.ok) {
         setUser(data.user);
         await syncUser()
-        router.push("/admin/dashboard");
+        router.push("/admin");
       } else {
         // Handle specific security challenges
         if (response.status === 403) {

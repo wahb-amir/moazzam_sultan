@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import connectToDb from "../../../lib/mongo";
 import User from "../../../modal/user";
-import Session from "../../../modal/session";
+import {Session} from "../../../modal/session";
 import { sendSecurityAlert } from "../../../lib/email";
 
 export async function POST(req) {

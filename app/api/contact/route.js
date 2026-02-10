@@ -3,7 +3,7 @@ import nodemailer from "nodemailer";
 import connectToDb from "../../lib/mongo";
 import Contact from "../../modal/contact";
 
-const RATE_LIMIT_MS = 10_000;
+const RATE_LIMIT_MS = 15_000;
 const MAX_RETRIES = 2; // Total 3 attempts
 const rateMap = new Map();
 

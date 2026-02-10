@@ -2,41 +2,44 @@ import mongoose, { Schema, model, models } from "mongoose";
 
 const UserSchema = new Schema(
   {
-    name: { 
-      type: String, 
+    name: {
+      type: String,
       required: [true, "Please provide a name"],
-      trim: true 
+      trim: true,
     },
-    email: { 
-      type: String, 
-      required: [true, "Please provide an email"], 
-      unique: true, 
+    email: {
+      type: String,
+      required: [true, "Please provide an email"],
+      unique: true,
       lowercase: true,
       trim: true,
-      match: [/^\[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please provide a valid email"]
+      match: [/^\[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please provide a valid email"],
     },
-    password: { 
-      type: String, 
+    password: {
+      type: String,
       required: [true, "Please provide a password"],
-      select: false, 
-      minlength: 8
+      select: false,
+      minlength: 8,
     },
-    role: { 
-      type: String, 
-      enum: ["admin", "editor", "viewer"], 
-      default: "admin" 
+    role: {
+      type: String,
+      enum: ["admin", "editor", "viewer"],
+      default: "admin",
     },
-    avatar: { 
-      type: String, 
-      default: "" 
+    avatar: {
+      type: String,
+      default: "",
     },
-    lastLogin: { 
-      type: Date 
-    }
+    lastLogin: {
+      type: Date,
+    },
+    magicToken: { type: String, select: false },
+    magicTokenExpires: { type: Date, select: false },
   },
-  { 
-    timestamps: true 
-  }
+
+  {
+    timestamps: true,
+  },
 );
 
 // Prevent re-compiling the model in Next.js development

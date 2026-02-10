@@ -104,7 +104,7 @@ export default function About() {
                 <div className="absolute inset-4 rounded-full overflow-hidden border-4 border-white shadow-2xl z-10">
                   <motion.img
                     whileHover={{ scale: 1.1, rotate: 2 }}
-                    src="/face.png"
+                    src="/face.avif"
                     alt="Moazzam Sultan"
                     className="w-full h-full object-cover transition-transform duration-500"
                   />
@@ -212,6 +212,7 @@ export default function About() {
             <div className="mt-10 flex flex-col sm:flex-row gap-4">
               <a
                 href={SOCIAL_LINKS.whatsapp}
+                target="_blank"
                 className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700 transition-all shadow-xl shadow-blue-200"
               >
                 Book a Free Trial <ArrowRight size={18} />

@@ -106,7 +106,7 @@ export function AuthProvider({
       }
       setLoading(true);
       try {
-        let res = await fetch("/api/user/me", {
+        let res = await fetch("/api/admin", {
           method: "GET",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
@@ -115,7 +115,7 @@ export function AuthProvider({
         if (res.status === 401) {
           const ok = await refreshTokens();
           if (ok) {
-            res = await fetch("/api/user/me", {
+            res = await fetch("/api/admin", {
               method: "GET",
               credentials: "include",
               headers: { "Content-Type": "application/json" },
@@ -161,7 +161,7 @@ export function AuthProvider({
 
   const syncUser = useCallback(async (): Promise<void> => {
     try {
-      const res = await fetch("/api/user/me", {
+      const res = await fetch("/api/admin", {
         method: "GET",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

@@ -7,13 +7,8 @@ import {
   Users,
   Calendar,
   Library,
-  MessageSquare,
-  Smartphone,
-  Globe,
   ExternalLink,
   CheckCircle2,
-  AlertCircle,
-  Undo2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import PreviewPanel from "../components/Preview";
@@ -22,8 +17,6 @@ import {
   AboutEditor,
   ScheduleEditor,
   LibraryEditor,
-  TestimonialsEditor,
-  ContactEditor,
   StatsEditor,
 } from "../components/Editors";
 import { Button, Card, SectionHeader } from "../components/Ui";
@@ -43,9 +36,7 @@ function getEmptyDraft() {
       headline: "Expert Mathematics Pedagogy",
       subheadline: "Crafting clarity from Mathematical Chaos.",
       description: "As a Master’s degree holder with specialized experience...",
-      specialties: [
-        { name: "O/A Levels", topic: "Calculus" },
-      ],
+      specialties: [{ name: "O/A Levels", topic: "Calculus" }],
     },
     schedule: {
       timeZone: "GMT+5 (PKT)",
@@ -70,9 +61,6 @@ function getEmptyDraft() {
   };
 }
 
-/**
- * Generates the empty grid for the availability calendar
- */
 function generateDefaultSlots() {
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const times = [16, 17, 18, 19, 20, 21];
@@ -83,50 +71,75 @@ function generateDefaultSlots() {
   });
   return slots;
 }
+
 export default function Dashboard() {
-  const {user}=useAuth()
+  // ---------- hooks (always run in same order) ----------
+  const { user,loading:authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [draft, setDraft] = useState(getEmptyDraft());
   const [versions, setVersions] = useState([]);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [message, setMessage] = useState([]);
-  const router= useRouter()
+  const router = useRouter();
   const saveRef = useRef(null);
-  useEffect(() => {
-    if (!user) {
-      router.push("/");
-    }
-  }, [user, router]);
 
-  if (!user) return (
-      <div className="h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin text-blue-600" />
-      </div>
-    );;
+ // ---------- log user state ----------
   useEffect(() => {
+    if (!authLoading) {
+      
+      if (!user) {router.push("/")}
+    }
+  }, [authLoading, user]);
+
+  // Data-load effect: runs when `user` becomes present. Keeps loading true until fetch done.
+  useEffect(() => {
+    let mounted = true;
+    // If no user yet, keep loading until user resolves (avoids fetching/setting state unnecessarily)
+    if (!user) {
+      setLoading(true);
+      return () => {
+        mounted = false;
+      };
+    }
+
     async function load() {
       try {
         const res = await fetch("/api/portfolio/draft");
         const json = await res.json();
+        if (!mounted) return;
         setDraft(json.data || getEmptyDraft());
+
         const vRes = await fetch("/api/portfolio/versions");
         const vJson = await vRes.json();
+        if (!mounted) return;
         setVersions(vJson.versions || []);
       } catch (e) {
+        if (!mounted) return;
         setDraft(getEmptyDraft());
       } finally {
+        if (!mounted) return;
         setLoading(false);
       }
     }
+
     load();
-  }, []);
 
-  // INSTANT UPDATE LOGIC
+    return () => {
+      mounted = false;
+      // clear any pending save timer when component unmounts
+      if (saveRef.current) {
+        clearTimeout(saveRef.current);
+        saveRef.current = null;
+      }
+    };
+  }, [user]);
+
+  // ---------- event handlers ----------
   const handleUpdate = (newDraft) => {
-    setDraft(newDraft); // This triggers the PreviewPanel instantly
+    setDraft(newDraft);
 
-    // Debounced Save to Database
+    // Debounced save
     setSaving(true);
     if (saveRef.current) clearTimeout(saveRef.current);
     saveRef.current = setTimeout(async () => {
@@ -138,9 +151,19 @@ export default function Dashboard() {
         });
       } finally {
         setSaving(false);
+        saveRef.current = null;
       }
     }, 1000);
   };
+
+  // ---------- conditional UI ----------
+  // Keep all hooks above this return. Returning here is fine.
+  if (!user)
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <Loader2 className="animate-spin text-blue-600" />
+      </div>
+    );
 
   if (loading)
     return (
@@ -149,13 +172,12 @@ export default function Dashboard() {
       </div>
     );
 
+  // ---------- render ----------
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b p-4 flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <div className="bg-blue-600 text-white p-2 rounded-lg font-bold">
-            MS
-          </div>
+          <div className="bg-blue-600 text-white p-2 rounded-lg font-bold">MS</div>
           <div className="text-xs text-slate-400 flex items-center gap-1">
             {saving ? (
               <>
@@ -169,18 +191,10 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => window.open("/preview", "_blank")}
-          >
+          <Button variant="outline" onClick={() => window.open("/preview", "_blank")}>
             <ExternalLink size={16} /> Preview
           </Button>
-          <Button
-            variant="primary"
-            onClick={() => {
-              /* Publish Logic */
-            }}
-          >
+          <Button variant="primary" onClick={() => { /* Publish Logic */ }}>
             Publish Site
           </Button>
         </div>

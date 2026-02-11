@@ -10,13 +10,24 @@ import {
   Calendar,
   Award,
 } from "lucide-react";
+import * as Icons from "lucide-react";
+
+// Resolve an icon value that might be either a component or a string name
+function resolveIcon(icon) {
+  if (!icon) return null;
+  if (typeof icon === "string") {
+    // exact lookup: DATA uses "Award", "Calendar", etc.
+    return Icons[icon] || null;
+  }
+  return icon;
+}
 import PropTypes from "prop-types";
 
 // Default data (keeps previous visual and content defaults)
 const DEFAULT_AVAILABILITY = {
   status: "limited",
   note: "Currently at near-full capacity. Only 2 weekend slots remaining.",
-  timezone: "GMT+5 (PKT)",
+  timezone: "GMT5 (PKT)",
   hours: ["4 PM", "5 PM", "6 PM", "7 PM", "8 PM", "9 PM"],
   days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
   schedule: [
@@ -30,10 +41,10 @@ const DEFAULT_AVAILABILITY = {
 };
 
 const DEFAULT_STATS = [
-  { icon: Award, value: "4+", label: "Years Experience" },
-  { icon: Calendar, value: "200+", label: "Lessons Delivered" },
+  { icon: Award, value: "4", label: "Years Experience" },
+  { icon: Calendar, value: "200", label: "Lessons Delivered" },
   { icon: Clock, value: "100%", label: "On-time" },
-  { icon: Youtube, value: "300+", label: "Video Tutorials" },
+  { icon: Youtube, value: "300", label: "Video Tutorials" },
 ];
 
 const DEFAULT_SOCIALS = {
@@ -43,6 +54,7 @@ const DEFAULT_SOCIALS = {
 
 export default function About(props) {
   // Top-level props with sensible defaults
+  
   const {
     id = "about",
     containerClassName = "py-24 bg-white relative overflow-hidden",

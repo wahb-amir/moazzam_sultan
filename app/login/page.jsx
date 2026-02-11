@@ -1,32 +1,41 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {useAuth} from '../providers/AuthProvider'
-import { 
-  ArrowRight, 
-  Command, 
-  Cpu, 
-  Fingerprint, 
+import { useAuth } from "../providers/AuthProvider";
+import {
+  ArrowRight,
+  Command,
+  Cpu,
+  Fingerprint,
   Hexagon,
-  AlertCircle 
+  AlertCircle,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 
 export default function ProfessionalLogin() {
   const router = useRouter();
-  const { setUser,syncUser } = useAuth();
-  
+  const { setUser, syncUser, loading: authLoading, user } = useAuth();
+  useEffect(() => {
+    if (!authLoading) {
+      if (user) {
+        router.push("/admin");
+      }
+    }
+  }, [authLoading, user]);
+
   // Form States
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Helper to generate a simple device fingerprint 
+  // Helper to generate a simple device fingerprint
   // (In production, consider using @fingerprintjs/fingerprintjs)
   const getFingerprint = () => {
-    return btoa(navigator.userAgent + navigator.language + window.screen.colorDepth);
+    return btoa(
+      navigator.userAgent + navigator.language + window.screen.colorDepth,
+    );
   };
 
   const handleLogin = async (e) => {
@@ -38,10 +47,10 @@ export default function ProfessionalLogin() {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          email, 
-          password, 
-          fingerprint: getFingerprint() 
+        body: JSON.stringify({
+          email,
+          password,
+          fingerprint: getFingerprint(),
         }),
       });
 
@@ -49,12 +58,14 @@ export default function ProfessionalLogin() {
 
       if (response.ok) {
         setUser(data.user);
-        await syncUser()
+        await syncUser();
         router.push("/admin");
       } else {
         // Handle specific security challenges
         if (response.status === 403) {
-          setError("New location detected. Please check your email for a Magic Link.");
+          setError(
+            "New location detected. Please check your email for a Magic Link.",
+          );
         } else {
           setError(data.error || "Invalid credentials. Access denied.");
         }
@@ -69,14 +80,14 @@ export default function ProfessionalLogin() {
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center bg-slate-50 overflow-hidden font-sans text-slate-900 selection:bg-blue-100">
       <Navbar />
-      
+
       {/* --- BACKGROUND LAYER --- */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <div 
+        <div
           className="absolute inset-0 opacity-[0.04]"
           style={{
             backgroundImage: `linear-gradient(#2563eb 1px, transparent 1px), linear-gradient(90deg, #2563eb 1px, transparent 1px)`,
-            backgroundSize: '40px 40px'
+            backgroundSize: "40px 40px",
           }}
         />
         <div className="absolute top-0 bottom-0 left-1/2 w-px bg-blue-500/10"></div>
@@ -91,8 +102,12 @@ export default function ProfessionalLogin() {
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-50 text-blue-600 mb-6 border border-blue-100 shadow-sm">
               <Hexagon strokeWidth={1.5} size={24} />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Portfolio CMS</h1>
-            <p className="text-slate-500 text-sm mt-2 font-medium">Access the control plane.</p>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+              Portfolio CMS
+            </h1>
+            <p className="text-slate-500 text-sm mt-2 font-medium">
+              Access the control plane.
+            </p>
           </div>
 
           {/* Error Message Display */}
@@ -112,7 +127,7 @@ export default function ProfessionalLogin() {
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within/input:text-blue-500 transition-colors">
                   <Command size={16} />
                 </div>
-                <input 
+                <input
                   type="email"
                   required
                   value={email}
@@ -131,7 +146,7 @@ export default function ProfessionalLogin() {
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within/input:text-blue-500 transition-colors">
                   <Fingerprint size={16} />
                 </div>
-                <input 
+                <input
                   type="password"
                   required
                   value={password}
@@ -142,7 +157,7 @@ export default function ProfessionalLogin() {
               </div>
             </div>
 
-            <button 
+            <button
               type="submit"
               disabled={loading}
               className="w-full mt-2 relative overflow-hidden bg-slate-900 hover:bg-blue-600 text-white font-medium py-3 rounded-lg transition-all duration-300 shadow-lg shadow-slate-900/20 hover:shadow-blue-600/30 group/btn"
@@ -156,7 +171,10 @@ export default function ProfessionalLogin() {
                 ) : (
                   <>
                     <span className="text-sm">Initialize Session</span>
-                    <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
+                    <ArrowRight
+                      size={16}
+                      className="group-hover/btn:translate-x-1 transition-transform"
+                    />
                   </>
                 )}
               </div>
@@ -164,11 +182,11 @@ export default function ProfessionalLogin() {
           </form>
 
           <div className="mt-8 flex items-center justify-center border-t border-slate-100 pt-6">
-             <button 
-               type="button"
-               onClick={() => router.push('/admin/magic-link')}
-               className="text-xs text-slate-500 hover:text-blue-600 font-medium transition-colors"
-             >
+            <button
+              type="button"
+              onClick={() => router.push("/admin/magic-link")}
+              className="text-xs text-slate-500 hover:text-blue-600 font-medium transition-colors"
+            >
               Use Magic Link instead?
             </button>
           </div>

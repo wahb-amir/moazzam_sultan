@@ -1,5 +1,5 @@
-// src/components/About.jsx
 "use client";
+
 import React, { useRef, useEffect, useState, useMemo } from "react";
 import { motion, useAnimation } from "framer-motion";
 import {
@@ -10,9 +10,10 @@ import {
   Calendar,
   Award,
 } from "lucide-react";
-import { STATS, SOCIAL_LINKS } from "../data";
+import PropTypes from "prop-types";
 
-const AVAILABILITY = {
+// Default data (keeps previous visual and content defaults)
+const DEFAULT_AVAILABILITY = {
   status: "limited",
   note: "Currently at near-full capacity. Only 2 weekend slots remaining.",
   timezone: "GMT+5 (PKT)",
@@ -28,10 +29,64 @@ const AVAILABILITY = {
   ],
 };
 
-export default function About() {
+const DEFAULT_STATS = [
+  { icon: Award, value: "4+", label: "Years Experience" },
+  { icon: Calendar, value: "200+", label: "Lessons Delivered" },
+  { icon: Clock, value: "100%", label: "On-time" },
+  { icon: Youtube, value: "300+", label: "Video Tutorials" },
+];
+
+const DEFAULT_SOCIALS = {
+  youtube: "https://youtube.com/",
+  whatsapp: "https://wa.me/",
+};
+
+export default function About(props) {
+  // Top-level props with sensible defaults
+  const {
+    id = "about",
+    containerClassName = "py-24 bg-white relative overflow-hidden",
+    portrait = {},
+    intro = {},
+    copy = {},
+    primaryAction = {
+      text: "Book a Free Trial",
+      href: DEFAULT_SOCIALS.whatsapp,
+      openInNewTab: true,
+    },
+    resumeAction = { text: "Resume", href: "#" },
+    availability = DEFAULT_AVAILABILITY,
+    stats = DEFAULT_STATS,
+    socials = DEFAULT_SOCIALS,
+    statStyles = null,
+  } = props;
+
+  // Nested defaults
+  const {
+    src: portraitSrc = "/face.avif",
+    alt: portraitAlt = "Instructor",
+    width = 384,
+    height = 384,
+    badge = { text: "MSc Math", icon: Award },
+    availabilityBadge = { text: "Available", colorClass: "bg-green-500" },
+  } = portrait;
+
+  const {
+    eyebrow = "Expert Mathematics Pedagogy",
+    titlePre = "Crafting clarity from",
+    titleHighlight = "Mathematical Chaos.",
+    subtitleHTML = null,
+  } = intro;
+
+  const {
+    lead = `As a Master’s degree holder with over 4 years of specialized experience, I don't just teach formulas—I build logical foundations.`,
+    tags = ["O/A Levels", "Punjab Board", "Calculus"],
+    quote = `My virtual classroom mimics a physical whiteboard experience using high-precision digital tablets for real-time problem-solving.`,
+  } = copy;
+
   const sectionRef = useRef(null);
   const circleControls = useAnimation();
-  const [circumference] = useState(289); // 2 * PI * 46 (approx)
+  const [circumference] = useState(289); // visual ring fallback
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -50,62 +105,56 @@ export default function About() {
   }, [circleControls]);
 
   const STAT_STYLES = useMemo(
-    () => [
-      {
-        gradient: "from-blue-500 to-cyan-400",
-        bg: "bg-blue-50",
-        text: "text-blue-600",
-        pct: 95,
-      },
-      {
-        gradient: "from-purple-500 to-indigo-400",
-        bg: "bg-purple-50",
-        text: "text-purple-600",
-        pct: 88,
-      },
-      {
-        gradient: "from-emerald-500 to-teal-400",
-        bg: "bg-emerald-50",
-        text: "text-emerald-600",
-        pct: 100,
-      },
-      {
-        gradient: "from-orange-500 to-yellow-400",
-        bg: "bg-orange-50",
-        text: "text-orange-600",
-        pct: 92,
-      },
-    ],
-    [],
+    () =>
+      statStyles || [
+        {
+          gradient: "from-blue-500 to-cyan-400",
+          bg: "bg-blue-50",
+          text: "text-blue-600",
+          pct: 95,
+        },
+        {
+          gradient: "from-purple-500 to-indigo-400",
+          bg: "bg-purple-50",
+          text: "text-purple-600",
+          pct: 88,
+        },
+        {
+          gradient: "from-emerald-500 to-teal-400",
+          bg: "bg-emerald-50",
+          text: "text-emerald-600",
+          pct: 100,
+        },
+        {
+          gradient: "from-orange-500 to-yellow-400",
+          bg: "bg-orange-50",
+          text: "text-orange-600",
+          pct: 92,
+        },
+      ],
+    [statStyles],
   );
 
   return (
-    <section
-      id="about"
-      ref={sectionRef}
-      className="py-24 bg-white relative overflow-hidden"
-    >
+    <section id={id} ref={sectionRef} className={containerClassName}>
       <div className="container mx-auto px-6 max-w-7xl">
-        {/* ASYMMETRIC GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 xl:gap-24 items-center mb-20">
-          {/* LEFT: Portrait Column (5/12) */}
           <div className="lg:col-span-5 flex justify-center lg:justify-start">
             <div className="relative group">
-              {/* Momentum Pulse Effect */}
               <motion.div
                 animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.4, 0.2] }}
                 transition={{ duration: 4, repeat: Infinity }}
                 className="absolute inset-0 bg-blue-400/20 rounded-full blur-3xl -z-10"
               />
 
-              {/* Main Portrait Container */}
-              <div className="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96">
-                {/* Image Wrapper */}
+              <div
+                className={`relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96`}
+              >
                 <div className="absolute inset-4 rounded-full overflow-hidden border-4 border-white shadow-2xl z-10">
                   <motion.img
                     whileHover={{ scale: 1.1, rotate: 2 }}
-                    src="/face.avif"
-                    alt="Moazzam Sultan"
+                    src={portraitSrc}
+                    alt={portraitAlt}
                     className="w-full h-full object-cover transition-transform duration-500"
                   />
                 </div>
@@ -142,25 +191,32 @@ export default function About() {
                   />
                 </svg>
 
-                {/* Badges Overlay */}
                 <div className="absolute top-8 -left-4 z-30 bg-white px-4 py-2 rounded-2xl shadow-xl border border-slate-50 flex items-center gap-2">
-                  <Award className="text-blue-600" size={18} />
+                  {badge?.icon
+                    ? React.createElement(badge.icon, {
+                        className: "text-blue-600",
+                        size: 18,
+                      })
+                    : null}
                   <span className="text-sm font-bold text-slate-800 tracking-tight">
-                    MSc Math
+                    {badge?.text}
                   </span>
                 </div>
 
                 <div className="absolute bottom-12 -right-4 z-30 bg-white px-4 py-2 rounded-full shadow-xl border border-slate-50 flex items-center gap-2">
-                  <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                  <span
+                    className={`flex h-2 w-2 rounded-full ${availability?.status === "limited" ? "bg-orange-500" : "bg-green-500"} animate-pulse`}
+                  />
                   <span className="text-xs font-black uppercase text-slate-700">
-                    Available
+                    {availability?.statusLabel ||
+                      availability?.status ||
+                      "Available"}
                   </span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* RIGHT: Content Column (7/12) */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -168,29 +224,21 @@ export default function About() {
             className="lg:col-span-7"
           >
             <span className="inline-block px-4 py-1.5 bg-blue-50 text-blue-700 text-xs font-black uppercase tracking-widest rounded-full mb-6">
-              Expert Mathematics Pedagogy
+              {eyebrow}
             </span>
 
             <h3 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 leading-[1.1]">
-              Crafting clarity from <br />
+              {titlePre} <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700">
-                Mathematical Chaos.
+                {titleHighlight}
               </span>
             </h3>
 
             <div className="space-y-6 text-slate-600 text-lg leading-relaxed">
-              <p>
-                As a Master’s degree holder with over 4 years of specialized
-                experience, I don't just teach formulas—I build
-                <span className="text-slate-900 font-bold">
-                  {" "}
-                  logical foundations
-                </span>
-                .
-              </p>
+              <p dangerouslySetInnerHTML={{ __html: lead }} />
 
               <div className="flex flex-wrap gap-3">
-                {["O/A Levels", "Punjab Board", "Calculus"].map((tag) => (
+                {(tags || []).map((tag) => (
                   <span
                     key={tag}
                     className="px-4 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold text-slate-700"
@@ -201,84 +249,76 @@ export default function About() {
               </div>
 
               <div className="relative p-6 bg-gradient-to-br from-slate-50 to-white rounded-3xl border border-slate-100 shadow-sm">
-                <p className="italic text-slate-700 font-medium">
-                  "My virtual classroom mimics a physical whiteboard experience
-                  using high-precision digital tablets for real-time
-                  problem-solving."
-                </p>
+                <p className="italic text-slate-700 font-medium">{quote}</p>
               </div>
             </div>
 
             <div className="mt-10 flex flex-col sm:flex-row gap-4">
               <a
-                href={SOCIAL_LINKS.whatsapp}
-                target="_blank"
+                href={primaryAction.href}
+                target={primaryAction.openInNewTab ? "_blank" : undefined}
+                rel={
+                  primaryAction.openInNewTab ? "noreferrer noopener" : undefined
+                }
                 className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700 transition-all shadow-xl shadow-blue-200"
               >
-                Book a Free Trial <ArrowRight size={18} />
+                {primaryAction.text} <ArrowRight size={18} />
               </a>
               <a
-                href="#"
+                href={resumeAction.href}
                 className="px-8 py-4 bg-white border-2 border-slate-200 text-slate-700 rounded-2xl font-bold flex items-center justify-center gap-2 hover:border-blue-600 hover:text-blue-600 transition-all"
               >
-                <Download size={18} /> Resume
+                <Download size={18} /> {resumeAction.text}
               </a>
             </div>
           </motion.div>
         </div>
 
-        {/* AVAILABILITY CALENDAR UI */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="relative bg-white border border-slate-100 rounded-[2.5rem] p-8 md:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.04)] overflow-hidden"
         >
-          {/* Soft Momentum Glows - Matches the Portrait area */}
           <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-100/50 blur-[100px] rounded-full -z-10" />
           <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-100/40 blur-[100px] rounded-full -z-10" />
 
           <div className="flex flex-col lg:flex-row justify-between gap-12 relative z-10">
-            {/* Left Info Column */}
             <div className="max-w-md">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2.5 bg-blue-600 rounded-xl shadow-lg shadow-blue-200">
                   <Calendar className="text-white" size={20} />
                 </div>
                 <h4 className="text-3xl font-black text-slate-900 tracking-tight">
-                  Weekly Schedule
+                  {availability.title || "Weekly Schedule"}
                 </h4>
               </div>
 
               <p className="text-slate-500 font-medium mb-8 flex items-center gap-2">
-                <Clock size={16} className="text-blue-500" />
-                Time Zone:{" "}
-                <span className="text-slate-900">{AVAILABILITY.timezone}</span>
+                <Clock size={16} className="text-blue-500" /> Time Zone:{" "}
+                <span className="text-slate-900">{availability.timezone}</span>
               </p>
 
-              {/* Modern Status Card */}
               <div className="bg-slate-50/80 backdrop-blur-md p-6 rounded-[2rem] border border-white shadow-inner relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-orange-100/50 blur-2xl rounded-full" />
 
                 <div className="flex items-center gap-3 mb-3 relative z-10">
                   <div className="flex h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
                   <span className="font-black uppercase text-[10px] tracking-[0.2em] text-orange-600">
-                    Current Status
+                    {availability.statusLabel || "Current Status"}
                   </span>
                 </div>
                 <p className="text-sm text-slate-600 leading-relaxed font-medium relative z-10">
-                  {AVAILABILITY.note}
+                  {availability.note}
                 </p>
               </div>
             </div>
 
-            {/* Right Grid Column */}
             <div className="flex-1 overflow-x-auto no-scrollbar">
               <div className="min-w-[600px] p-1">
-                {/* Days Header */}
                 <div className="grid grid-cols-8 gap-3 mb-6">
-                  <div /> {/* Empty Corner */}
-                  {AVAILABILITY.days.map((d) => (
+                  <div />
+                  {(availability.days || []).map((d) => (
                     <div
                       key={d}
                       className="text-center text-[11px] font-black uppercase tracking-widest text-slate-400"
@@ -288,9 +328,8 @@ export default function About() {
                   ))}
                 </div>
 
-                {/* Time Slots */}
                 <div className="space-y-3">
-                  {AVAILABILITY.hours.map((time, r) => (
+                  {(availability.hours || []).map((time, r) => (
                     <div
                       key={time}
                       className="grid grid-cols-8 gap-3 items-center"
@@ -298,15 +337,11 @@ export default function About() {
                       <div className="text-[11px] font-bold text-slate-400 text-right pr-4">
                         {time}
                       </div>
-                      {AVAILABILITY.schedule[r].map((val, c) => (
+                      {(availability.schedule?.[r] || []).map((val, c) => (
                         <motion.div
                           key={c}
                           whileHover={val ? { scale: 1.05, y: -2 } : {}}
-                          className={`h-12 rounded-2xl transition-all duration-300 flex items-center justify-center text-[10px] font-black tracking-tighter ${
-                            val
-                              ? "bg-blue-600 text-white shadow-md shadow-blue-100 cursor-pointer hover:bg-blue-700"
-                              : "bg-slate-50 text-slate-300 border border-slate-100/50"
-                          }`}
+                          className={`h-12 rounded-2xl transition-all duration-300 flex items-center justify-center text-[10px] font-black tracking-tighter ${val ? "bg-blue-600 text-white shadow-md shadow-blue-100 cursor-pointer hover:bg-blue-700" : "bg-slate-50 text-slate-300 border border-slate-100/50"}`}
                         >
                           {val ? "BOOK" : "—"}
                         </motion.div>
@@ -315,7 +350,6 @@ export default function About() {
                   ))}
                 </div>
 
-                {/* Legend Footer */}
                 <div className="mt-8 flex items-center justify-end gap-6">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-blue-600" />
@@ -335,9 +369,8 @@ export default function About() {
           </div>
         </motion.div>
 
-        {/* STATS WITH ANIMATED BARS */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
-          {STATS.map((stat, idx) => {
+          {(stats || []).map((stat, idx) => {
             const style = STAT_STYLES[idx % STAT_STYLES.length];
             return (
               <motion.div
@@ -348,7 +381,9 @@ export default function About() {
                 <div
                   className={`${style.bg} ${style.text} w-12 h-12 rounded-2xl flex items-center justify-center mb-4`}
                 >
-                  <stat.icon size={24} />
+                  {stat.icon
+                    ? React.createElement(stat.icon, { size: 24 })
+                    : null}
                 </div>
                 <h4 className="text-3xl font-black text-slate-900">
                   {stat.value}
@@ -357,7 +392,6 @@ export default function About() {
                   {stat.label}
                 </p>
 
-                {/* Dynamic Progress Bar */}
                 <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
@@ -374,3 +408,53 @@ export default function About() {
     </section>
   );
 }
+
+About.propTypes = {
+  id: PropTypes.string,
+  containerClassName: PropTypes.string,
+  portrait: PropTypes.shape({
+    src: PropTypes.string,
+    alt: PropTypes.string,
+    width: PropTypes.number,
+    height: PropTypes.number,
+    badge: PropTypes.shape({
+      text: PropTypes.string,
+      icon: PropTypes.elementType,
+    }),
+    availabilityBadge: PropTypes.shape({
+      text: PropTypes.string,
+      colorClass: PropTypes.string,
+    }),
+  }),
+  intro: PropTypes.shape({
+    eyebrow: PropTypes.string,
+    titlePre: PropTypes.string,
+    titleHighlight: PropTypes.string,
+    subtitleHTML: PropTypes.string,
+  }),
+  copy: PropTypes.shape({
+    lead: PropTypes.string,
+    tags: PropTypes.arrayOf(PropTypes.string),
+    quote: PropTypes.string,
+  }),
+  primaryAction: PropTypes.shape({
+    text: PropTypes.string,
+    href: PropTypes.string,
+    openInNewTab: PropTypes.bool,
+  }),
+  resumeAction: PropTypes.shape({
+    text: PropTypes.string,
+    href: PropTypes.string,
+  }),
+  availability: PropTypes.shape({
+    status: PropTypes.string,
+    note: PropTypes.string,
+    timezone: PropTypes.string,
+    hours: PropTypes.array,
+    days: PropTypes.array,
+    schedule: PropTypes.arrayOf(PropTypes.array),
+  }),
+  stats: PropTypes.array,
+  socials: PropTypes.object,
+  statStyles: PropTypes.array,
+};

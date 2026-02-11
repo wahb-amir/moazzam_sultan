@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -14,22 +15,66 @@ import {
 } from "lucide-react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import { SOCIAL_LINKS } from "../data";
+import PropTypes from "prop-types";
+import { SOCIAL_LINKS as DEFAULT_SOCIALS } from "../data";
 
-const Contact = () => {
+export default function Contact(props) {
+  const {
+    socialLinks = DEFAULT_SOCIALS,
+    contactCards = null, // will build default below if null
+    apiEndpoint = "/api/contact",
+    initialFormState = { name: "", email: "", message: "" },
+    characterLimit = 500,
+    containerClassName = "py-16 md:py-24 bg-white text-slate-900 relative overflow-hidden",
+  } = props;
+
+  // build default contactCards from socialLinks if none provided
+  const defaultCards = [
+    {
+      icon: Phone,
+      label: "WhatsApp",
+      val: socialLinks.whatsapp || "+92 000 0000000",
+      link: socialLinks.whatsapp || "#",
+      color: "hover:border-green-200",
+      iconBg: "bg-green-50 text-green-600",
+    },
+    {
+      icon: Instagram,
+      label: "Instagram",
+      val: socialLinks.instagram || "@yourhandle",
+      link: socialLinks.instagram || "#",
+      color: "hover:border-pink-200",
+      iconBg: "bg-pink-100 text-pink-700",
+    },
+    {
+      icon: Mail,
+      label: "Email Me",
+      val: socialLinks.email || "hello@example.com",
+      link: socialLinks.email
+        ? `mailto:${socialLinks.email}`
+        : "mailto:hello@example.com",
+      color: "hover:border-blue-200",
+      iconBg: "bg-blue-50 text-blue-600",
+    },
+  ];
+
+  const cards = contactCards || defaultCards;
+
   const [formState, setFormState] = useState("idle");
   const [phone, setPhone] = useState("");
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
+  const [formData, setFormData] = useState(initialFormState);
 
-  const CHARACTER_LIMIT = 500;
+  useEffect(() => {
+    // cleanup on unmount
+    return () => {
+      // reset body overflow just in case
+      document.body.style.overflow = "unset";
+    };
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "message" && value.length > CHARACTER_LIMIT) return;
+    if (name === "message" && value.length > characterLimit) return;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -37,21 +82,21 @@ const Contact = () => {
     e.preventDefault();
     setFormState("sending");
     try {
-      const response = await fetch("/api/contact", {
+      const response = await fetch(apiEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...formData, phone }),
       });
       if (response.ok) {
         setFormState("sent");
-        setFormData({ name: "", email: "", message: "" });
+        setFormData(initialFormState);
         setPhone("");
         setTimeout(() => setFormState("idle"), 5000);
       } else {
         setFormState("error");
         setTimeout(() => setFormState("idle"), 4000);
       }
-    } catch (error) {
+    } catch (err) {
       setFormState("error");
       setTimeout(() => setFormState("idle"), 4000);
     }
@@ -63,10 +108,7 @@ const Contact = () => {
   };
 
   return (
-    <section
-      id="contact"
-      className="py-16 md:py-24 bg-white text-slate-900 relative overflow-hidden"
-    >
+    <section id="contact" className={containerClassName}>
       {/* Background Decor */}
       <div className="absolute top-0 left-1/4 w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-blue-50 rounded-full blur-[80px] md:blur-[120px] pointer-events-none opacity-60" />
       <div className="absolute bottom-0 right-1/4 w-[250px] md:w-[500px] h-[250px] md:h-[500px] bg-indigo-50 rounded-full blur-[70px] md:blur-[100px] pointer-events-none opacity-60" />
@@ -79,7 +121,6 @@ const Contact = () => {
           transition={{ staggerChildren: 0.1 }}
           className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start"
         >
-          {/* LEFT COLUMN */}
           <div className="lg:sticky lg:top-24 text-left">
             <motion.div
               variants={itemVariants}
@@ -91,7 +132,6 @@ const Contact = () => {
               </span>
             </motion.div>
 
-            {/* RESPONSIVE HEADING */}
             <motion.h2
               variants={itemVariants}
               className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-6 md:mb-8 leading-[1.1] text-slate-900 tracking-tight"
@@ -110,39 +150,14 @@ const Contact = () => {
               your favorite subject.
             </motion.p>
 
-            {/* CONTACT CARDS */}
             <div className="space-y-4">
-              {[
-                {
-                  icon: Phone,
-                  label: "WhatsApp",
-                  val: "+92 309 7016696",
-                  link: SOCIAL_LINKS.whatsapp,
-                  color: "hover:border-green-200",
-                  iconBg: "bg-green-50 text-green-600",
-                },
-                {
-                  icon: Instagram,
-                  label: "Instagram",
-                  val: "@iammoazzamsultan",
-                  link: SOCIAL_LINKS.instagram,
-                  color: "hover:border-pink-200",
-                  iconBg: "bg-pink-100 text-pink-700",
-                },
-                {
-                  icon: Mail,
-                  label: "Email Me",
-                  val: "sultanmoazzam3@gmail.com",
-                  link: `mailto:sultanmoazzam3@gmail.com`,
-                  color: "hover:border-blue-200",
-                  iconBg: "bg-blue-50 text-blue-600",
-                },
-              ].map((item, i) => (
+              {cards.map((item, i) => (
                 <motion.a
                   key={i}
                   variants={itemVariants}
                   href={item.link}
                   target="_blank"
+                  rel="noreferrer"
                   className={`flex items-center gap-4 md:gap-5 p-4 md:p-5 bg-white/80 backdrop-blur-sm rounded-3xl border border-slate-100 transition-all duration-300 group ${item.color} hover:shadow-xl hover:shadow-slate-200/50`}
                 >
                   <div
@@ -150,6 +165,7 @@ const Contact = () => {
                   >
                     <item.icon size={20} className="md:w-6 md:h-6" />
                   </div>
+
                   <div className="min-w-0 flex-1">
                     <h3 className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-0.5 md:mb-1">
                       {item.label}
@@ -158,6 +174,7 @@ const Contact = () => {
                       {item.val}
                     </p>
                   </div>
+
                   <ExternalLink
                     className="flex-shrink-0 text-slate-300 group-hover:text-blue-600 transition-colors"
                     size={18}
@@ -167,7 +184,6 @@ const Contact = () => {
             </div>
           </div>
 
-          {/* RIGHT COLUMN: FORM */}
           <motion.div variants={itemVariants} className="mt-8 lg:mt-0">
             <div className="bg-white/90 backdrop-blur-md rounded-[2.5rem] md:rounded-[3rem] p-6 md:p-12 border border-slate-100 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.08)]">
               <h3 className="text-xl md:text-2xl font-bold mb-8 md:mb-10 text-slate-900 flex items-center gap-3">
@@ -228,9 +244,9 @@ const Contact = () => {
                       Your Inquiry
                     </label>
                     <span
-                      className={`text-[9px] font-bold ${formData.message.length === CHARACTER_LIMIT ? "text-red-500" : "text-slate-400"}`}
+                      className={`text-[9px] font-bold ${formData.message.length === characterLimit ? "text-red-500" : "text-slate-400"}`}
                     >
-                      {formData.message.length}/{CHARACTER_LIMIT}
+                      {formData.message.length}/{characterLimit}
                     </span>
                   </div>
                   <textarea
@@ -246,13 +262,7 @@ const Contact = () => {
 
                 <button
                   disabled={formState === "sending" || formState === "sent"}
-                  className={`w-full h-14 md:h-16 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] md:text-sm relative overflow-hidden transition-all transform active:scale-95 shadow-lg ${
-                    formState === "sent"
-                      ? "bg-green-500 text-white"
-                      : formState === "error"
-                        ? "bg-red-500 text-white"
-                        : "bg-slate-900 text-white hover:bg-blue-600"
-                  }`}
+                  className={`w-full h-14 md:h-16 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] md:text-sm relative overflow-hidden transition-all transform active:scale-95 shadow-lg ${formState === "sent" ? "bg-green-500 text-white" : formState === "error" ? "bg-red-500 text-white" : "bg-slate-900 text-white hover:bg-blue-600"}`}
                 >
                   <AnimatePresence mode="wait">
                     {formState === "idle" && (
@@ -322,6 +332,13 @@ const Contact = () => {
       `}</style>
     </section>
   );
-};
+}
 
-export default Contact;
+Contact.propTypes = {
+  socialLinks: PropTypes.object,
+  contactCards: PropTypes.array,
+  apiEndpoint: PropTypes.string,
+  initialFormState: PropTypes.object,
+  characterLimit: PropTypes.number,
+  containerClassName: PropTypes.string,
+};

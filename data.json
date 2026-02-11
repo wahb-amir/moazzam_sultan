@@ -1,0 +1,138 @@
+{
+  "socialLinks": {
+    "youtube": "https://www.youtube.com/@iammoazzamsultan",
+    "whatsapp": "https://wa.me/923097016696",
+    "instagram": "https://instagram.com/iammoazzamsultan",
+    "email": "sultanmoazzam3@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/moazzamsultan"
+  },
+
+  "hero": {
+    "badgeText": "Mathematics Tutor • MSc Mathematics",
+    "title": { "pre": "Moazzam", "highlight": "Sultan", "level": 1 },
+    "subtitle": "Mastering Mathematics, one step at a time.",
+    "description": "Clear, interactive lessons for O-Levels, Matric, and beyond.",
+    "primaryAction": {
+      "text": "Watch Tutorials",
+      "href": "https://www.youtube.com/@iammoazzamsultan",
+      "openInNewTab": true
+    },
+    "secondaryAction": { "text": "Contact Me", "scrollToId": "contact" },
+    "video": {
+      "src": "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-blue-and-white-lines-9973-large.mp4",
+      "poster": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80&w=1920"
+    }
+  },
+
+  "about": {
+    "intro": {
+      "eyebrow": "Expert Mathematics Pedagogy",
+      "titlePre": "Crafting clarity from",
+      "titleHighlight": "Mathematical Chaos.",
+      "subtitleHTML": null
+    },
+    "copy": {
+      "lead": "As a Master’s degree holder with over 4 years of specialized experience, I don't just teach formulas—I build logical foundations.",
+      "tags": ["O/A Levels", "Punjab Board", "Calculus"],
+      "quote": "My virtual classroom mimics a physical whiteboard experience using high-precision digital tablets for real-time problem-solving."
+    },
+    "portrait": {
+      "src": "/face.avif",
+      "alt": "Moazzam Sultan",
+      "badge": { "text": "MSc Math", "icon": "Award" },
+      "availabilityBadge": { "text": "Available", "colorClass": "bg-green-500" }
+    },
+    "availability": {
+      "status": "limited",
+      "statusLabel": "Current Status",
+      "note": "Currently at near-full capacity. Only 2 weekend slots remaining.",
+      "timezone": "GMT+5 (PKT)",
+      "hours": ["4 PM", "5 PM", "6 PM", "7 PM", "8 PM", "9 PM"],
+      "days": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      "schedule": [
+        [0, 0, 1, 1, 0, 1, 1],
+        [0, 1, 1, 0, 0, 1, 1],
+        [0, 1, 0, 0, 0, 0, 0],
+        [1, 1, 0, 0, 1, 0, 0],
+        [1, 0, 0, 1, 1, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0]
+      ]
+    },
+    "primaryAction": {
+      "text": "Book a Free Trial",
+      "href": "https://wa.me/923097016696",
+      "openInNewTab": true
+    },
+    "resumeAction": { "text": "Resume", "href": "/resume.pdf" },
+    "stats": [
+      { "icon": "Award", "value": "4+", "label": "Years Experience" },
+      { "icon": "Calendar", "value": "200+", "label": "Lessons Delivered" },
+      { "icon": "Clock", "value": "100%", "label": "On-time" },
+      { "icon": "Youtube", "value": "300+", "label": "Video Tutorials" }
+    ]
+  },
+
+  "portfolioItems": [
+    {
+      "id": 1,
+      "type": "intro",
+      "title": "Meet Your Instructor: Moazzam Sultan",
+      "category": "Introduction",
+      "videoUrl": "https://youtu.be/2oPoVJV4APY",
+      "duration": "0:59",
+      "tags": ["Philosophy", "Methodology", "Experience"],
+      "description": "A brief look into my background, teaching style, and how I use digital tools to make complex mathematics easy to understand."
+    },
+    {
+      "id": 2,
+      "type": "video",
+      "title": "IGCSE Math: 2025 Paper 2 Walkthrough",
+      "category": "Cambridge IGCSE",
+      "videoUrl": "https://youtu.be/tsCgH-Pqdl8",
+      "duration": "1:51:21",
+      "tags": ["IGCSE", "Past Papers", "Exam Prep"],
+      "description": "A comprehensive, step-by-step solution of the latest IGCSE Extended Paper, focusing on exam techniques and time management."
+    },
+    {
+      "id": 3,
+      "type": "video",
+      "title": "The Art of Rationalizing Surds",
+      "category": "Matric (Class 9)",
+      "videoUrl": "https://youtu.be/8VyvRs1yBuc",
+      "duration": "2:11:55",
+      "tags": ["Algebra", "Radicals", "Rationalization"],
+      "description": "Mastering the concept of surds and binomial denominators. I explain the logic behind rationalizing to simplify complex fractions."
+    },
+    {
+      "id": 4,
+      "type": "video",
+      "title": "Understanding Angles & Geometry Basics",
+      "category": "Matric (Class 9)",
+      "videoUrl": "https://www.youtube.com/watch?v=AOkiRMqhDDw",
+      "duration": "1:04:09",
+      "tags": ["Geometry", "Quadrants", "Trigonometry"],
+      "description": "Exploring the fundamentals of angles, including quadrants and coterminal concepts, along with practical geometric applications."
+    }
+  ],
+
+  "testimonials": [
+    {
+      "id": 1,
+      "name": "Ali Khan",
+      "role": "IGCSE Student",
+      "text": "Moazzam's lessons completely changed how I approach problems. I improved from a C to an A in just one term."
+    },
+    {
+      "id": 2,
+      "name": "Sara Ahmed",
+      "role": "Matric Student",
+      "text": "Clear explanations and real-time problem solving made calculus click for me. Highly recommended!"
+    },
+    {
+      "id": 3,
+      "name": "Zain Raza",
+      "role": "O-Level Student",
+      "text": "The exam strategies and timed walkthroughs helped me manage my time and boost my confidence during tests."
+    }
+  ]
+}

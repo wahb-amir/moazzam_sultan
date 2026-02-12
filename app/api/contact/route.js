@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import connectToDb from "../../lib/mongo";
 import Contact from "../../modal/contact";
-
+import { verifyAccessToken, rotateTokens } from "../../lib/auth";
 const RATE_LIMIT_MS = 15_000;
 const MAX_RETRIES = 2; // Total 3 attempts
 const rateMap = new Map();
@@ -85,7 +85,7 @@ export async function POST(request) {
 
       return transporter.sendMail({
         from: `"${esc(name)}" <${process.env.SMTP_USER}>`,
-        to: "sultanmoazzam3@gmail.com",
+        to: "op422010@gmail.com",
         replyTo: email,
         subject: `New Message: ${name}`,
         html: generateTemplate({
@@ -140,4 +140,91 @@ function generateTemplate({ name, email, phone, message, dateStr, ip, ua }) {
       </div>
     </div>
   `;
+}
+async function getAuthSession(req) {
+  const accessToken = req.cookies.get('access_token')?.value;
+  const refreshToken = req.cookies.get('refresh_token')?.value;
+
+  if (accessToken) {
+    const decoded = verifyAccessToken(accessToken);
+    if (decoded) return { userId: decoded.uid || decoded.id, tokens: null };
+  }
+
+  if (refreshToken) {
+    const rotated = await rotateTokens(refreshToken);
+    if (rotated) return { userId: rotated.user.uid, tokens: rotated };
+  }
+
+  return null;
+}
+
+// --- GET: Fetch with Pagination & Auth ---
+export async function GET(req) {
+  try {
+    const session = await getAuthSession(req);
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    await connectToDb();
+
+    const { searchParams } = new URL(req.url);
+    const page = parseInt(searchParams.get('page')) || 1;
+    const limit = parseInt(searchParams.get('limit')) || 10;
+    const search = searchParams.get('search') || '';
+    const skip = (page - 1) * limit;
+
+    const query = search ? {
+      $or: [
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } }
+      ]
+    } : {};
+
+    const [submissions, total] = await Promise.all([
+      Contact.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+      Contact.countDocuments(query)
+    ]);
+
+    const res = NextResponse.json({
+      submissions,
+      pagination: {
+        total,
+        page,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
+
+    // Handle token rotation if it happened during the session check
+    if (session.tokens) {
+      const isProd = process.env.NODE_ENV === 'production';
+      res.cookies.set('access_token', session.tokens.accessToken, {
+        httpOnly: true, secure: isProd, sameSite: 'lax', path: '/', maxAge: 15 * 60 
+      });
+      res.cookies.set('refresh_token', session.tokens.refreshToken, {
+        httpOnly: true, secure: isProd, sameSite: 'lax', path: '/', maxAge: 7 * 24 * 60 * 60
+      });
+    }
+
+    return res;
+  } catch (err) {
+    return NextResponse.json({ error: "Server Error" }, { status: 500 });
+  }
+}
+
+// --- DELETE: Remove submission with Auth ---
+export async function DELETE(req) {
+  try {
+    const session = await getAuthSession(req);
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    await connectToDb();
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+
+    await Contact.findByIdAndDelete(id);
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    return NextResponse.json({ error: "Delete failed" }, { status: 500 });
+  }
 }

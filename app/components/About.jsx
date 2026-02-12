@@ -11,6 +11,7 @@ import {
   Award,
 } from "lucide-react";
 import * as Icons from "lucide-react";
+import PropTypes from "prop-types";
 
 // Resolve an icon value that might be either a component or a string name
 function resolveIcon(icon) {
@@ -21,7 +22,12 @@ function resolveIcon(icon) {
   }
   return icon;
 }
-import PropTypes from "prop-types";
+
+// Small helper to render an icon safely
+function renderIcon(icon, props = {}) {
+  const Icon = resolveIcon(icon);
+  return Icon ? <Icon {...props} /> : null;
+}
 
 // Default data (keeps previous visual and content defaults)
 const DEFAULT_AVAILABILITY = {
@@ -54,7 +60,6 @@ const DEFAULT_SOCIALS = {
 
 export default function About(props) {
   // Top-level props with sensible defaults
-  
   const {
     id = "about",
     containerClassName = "py-24 bg-white relative overflow-hidden",
@@ -204,12 +209,10 @@ export default function About(props) {
                 </svg>
 
                 <div className="absolute top-8 -left-4 z-30 bg-white px-4 py-2 rounded-2xl shadow-xl border border-slate-50 flex items-center gap-2">
-                  {badge?.icon
-                    ? React.createElement(badge.icon, {
-                        className: "text-blue-600",
-                        size: 18,
-                      })
-                    : null}
+                  {renderIcon(badge?.icon, {
+                    className: "text-blue-600",
+                    size: 18,
+                  })}
                   <span className="text-sm font-bold text-slate-800 tracking-tight">
                     {badge?.text}
                   </span>
@@ -217,7 +220,11 @@ export default function About(props) {
 
                 <div className="absolute bottom-12 -right-4 z-30 bg-white px-4 py-2 rounded-full shadow-xl border border-slate-50 flex items-center gap-2">
                   <span
-                    className={`flex h-2 w-2 rounded-full ${availability?.status === "limited" ? "bg-orange-500" : "bg-green-500"} animate-pulse`}
+                    className={`flex h-2 w-2 rounded-full ${
+                      availability?.status === "limited"
+                        ? "bg-orange-500"
+                        : "bg-green-500"
+                    } animate-pulse`}
                   />
                   <span className="text-xs font-black uppercase text-slate-700">
                     {availability?.statusLabel ||
@@ -353,7 +360,11 @@ export default function About(props) {
                         <motion.div
                           key={c}
                           whileHover={val ? { scale: 1.05, y: -2 } : {}}
-                          className={`h-12 rounded-2xl transition-all duration-300 flex items-center justify-center text-[10px] font-black tracking-tighter ${val ? "bg-blue-600 text-white shadow-md shadow-blue-100 cursor-pointer hover:bg-blue-700" : "bg-slate-50 text-slate-300 border border-slate-100/50"}`}
+                          className={`h-12 rounded-2xl transition-all duration-300 flex items-center justify-center text-[10px] font-black tracking-tighter ${
+                            val
+                              ? "bg-blue-600 text-white shadow-md shadow-blue-100 cursor-pointer hover:bg-blue-700"
+                              : "bg-slate-50 text-slate-300 border border-slate-100/50"
+                          }`}
                         >
                           {val ? "BOOK" : "—"}
                         </motion.div>
@@ -393,9 +404,7 @@ export default function About(props) {
                 <div
                   className={`${style.bg} ${style.text} w-12 h-12 rounded-2xl flex items-center justify-center mb-4`}
                 >
-                  {stat.icon
-                    ? React.createElement(stat.icon, { size: 24 })
-                    : null}
+                  {renderIcon(stat.icon, { size: 24 })}
                 </div>
                 <h4 className="text-3xl font-black text-slate-900">
                   {stat.value}
@@ -431,7 +440,7 @@ About.propTypes = {
     height: PropTypes.number,
     badge: PropTypes.shape({
       text: PropTypes.string,
-      icon: PropTypes.elementType,
+      icon: PropTypes.oneOfType([PropTypes.elementType, PropTypes.string]),
     }),
     availabilityBadge: PropTypes.shape({
       text: PropTypes.string,

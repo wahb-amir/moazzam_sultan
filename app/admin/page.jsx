@@ -21,6 +21,41 @@ import {
 } from "../components/Editors";
 import { Button, Card, SectionHeader } from "../components/Ui";
 
+import DATA from "@/data.json"; // <- your defaults
+
+// small deep clone + deep merge helpers
+function deepClone(obj) {
+  return obj === undefined ? undefined : JSON.parse(JSON.stringify(obj));
+}
+function deepMerge(base, override) {
+  if (base === undefined) return deepClone(override);
+  if (override === undefined) return deepClone(base);
+  if (Array.isArray(base) || Array.isArray(override)) {
+    // prefer override array if provided, otherwise base
+    return Array.isArray(override) ? deepClone(override) : deepClone(base);
+  }
+  if (typeof base !== "object" || typeof override !== "object") {
+    return deepClone(override !== undefined ? override : base);
+  }
+  const out = {};
+  const keys = new Set([...Object.keys(base), ...Object.keys(override)]);
+  keys.forEach((k) => {
+    out[k] = deepMerge(base[k], override[k]);
+  });
+  return out;
+}
+
+function generateDefaultSlots() {
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const times = [16, 17, 18, 19, 20, 21];
+  const slots = {};
+  days.forEach((d) => {
+    slots[d] = {};
+    times.forEach((t) => (slots[d][t] = "-"));
+  });
+  return slots;
+}
+
 function getEmptyDraft() {
   return {
     hero: {
@@ -61,22 +96,12 @@ function getEmptyDraft() {
   };
 }
 
-function generateDefaultSlots() {
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  const times = [16, 17, 18, 19, 20, 21];
-  const slots = {};
-  days.forEach((d) => {
-    slots[d] = {};
-    times.forEach((t) => (slots[d][t] = "-"));
-  });
-  return slots;
-}
-
 export default function Dashboard() {
   // ---------- hooks (always run in same order) ----------
-  const { user,loading:authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  // initial draft: start from DATA (deep cloned to avoid mutation)
+  const [draft, setDraft] = useState(() => deepMerge(getEmptyDraft(), DATA || {}));
   const [loading, setLoading] = useState(true);
-  const [draft, setDraft] = useState(getEmptyDraft());
   const [versions, setVersions] = useState([]);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
@@ -84,18 +109,18 @@ export default function Dashboard() {
   const router = useRouter();
   const saveRef = useRef(null);
 
- // ---------- log user state ----------
+  // ---------- log user state ----------
   useEffect(() => {
     if (!authLoading) {
-      
-      if (!user) {router.push("/")}
+      if (!user) {
+        router.push("/");
+      }
     }
-  }, [authLoading, user]);
+  }, [authLoading, user, router]);
 
-  // Data-load effect: runs when `user` becomes present. Keeps loading true until fetch done.
+  // Data-load effect: merge fetched draft over DATA defaults
   useEffect(() => {
     let mounted = true;
-    // If no user yet, keep loading until user resolves (avoids fetching/setting state unnecessarily)
     if (!user) {
       setLoading(true);
       return () => {
@@ -108,7 +133,11 @@ export default function Dashboard() {
         const res = await fetch("/api/portfolio/draft");
         const json = await res.json();
         if (!mounted) return;
-        setDraft(json.data || getEmptyDraft());
+
+        // merge server draft over DATA (DATA provides default values)
+        const serverDraft = json?.data;
+        const merged = serverDraft ? deepMerge(DATA, serverDraft) : deepMerge(DATA, getEmptyDraft());
+        setDraft(merged);
 
         const vRes = await fetch("/api/portfolio/versions");
         const vJson = await vRes.json();
@@ -116,7 +145,8 @@ export default function Dashboard() {
         setVersions(vJson.versions || []);
       } catch (e) {
         if (!mounted) return;
-        setDraft(getEmptyDraft());
+        // fallback to DATA or empty draft
+        setDraft(deepMerge(DATA, getEmptyDraft()));
       } finally {
         if (!mounted) return;
         setLoading(false);
@@ -127,7 +157,6 @@ export default function Dashboard() {
 
     return () => {
       mounted = false;
-      // clear any pending save timer when component unmounts
       if (saveRef.current) {
         clearTimeout(saveRef.current);
         saveRef.current = null;
@@ -139,7 +168,7 @@ export default function Dashboard() {
   const handleUpdate = (newDraft) => {
     setDraft(newDraft);
 
-    // Debounced save
+    // Debounced save (still saves to your /api/portfolio endpoint)
     setSaving(true);
     if (saveRef.current) clearTimeout(saveRef.current);
     saveRef.current = setTimeout(async () => {
@@ -157,7 +186,6 @@ export default function Dashboard() {
   };
 
   // ---------- conditional UI ----------
-  // Keep all hooks above this return. Returning here is fine.
   if (!user)
     return (
       <div className="h-screen flex items-center justify-center">
@@ -200,9 +228,10 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* EDITORS COLUMN */}
-        <div className="lg:col-span-7 space-y-8">
+      {/* single-column so preview stays mobile-style */}
+      <main className="max-w-7xl mx-auto p-6 grid grid-cols-1 gap-8">
+        {/* EDITORS STACK */}
+        <div className="space-y-8">
           <SectionHeader icon={<Layout />} title="Hero" />
           <HeroEditor draft={draft} onChange={handleUpdate} />
 
@@ -216,22 +245,27 @@ export default function Dashboard() {
           <LibraryEditor draft={draft} onChange={handleUpdate} />
         </div>
 
-        {/* STICKY PREVIEW COLUMN */}
-        <aside className="lg:col-span-5">
-          <div className="sticky top-24 space-y-6">
-            <div className="rounded-3xl border-8 border-slate-900 shadow-2xl overflow-hidden h-[700px] bg-white relative">
-              <div className="absolute top-0 w-full h-6 bg-slate-900 flex justify-center items-center">
-                <div className="w-16 h-1 bg-slate-700 rounded-full"></div>
-              </div>
-              <div className="h-full overflow-y-auto pt-6 custom-scrollbar">
-                <PreviewPanel data={draft} />
-              </div>
+        {/* PREVIEW */}
+        <div className="w-full">
+          <div
+            className="rounded-3xl border-8 border-slate-900 shadow-2xl overflow-hidden h-[700px] bg-white relative mx-auto"
+            style={{ maxWidth: 980 }}
+          >
+            <div className="absolute top-0 w-full h-6 bg-slate-900 flex justify-center items-center">
+              <div className="w-16 h-1 bg-slate-700 rounded-full"></div>
             </div>
+            <div className="h-full overflow-y-auto pt-6 custom-scrollbar">
+              {/* PreviewPanel reads the passed `draft` and updates live */}
+              <PreviewPanel data={draft} onChange={handleUpdate} />
+            </div>
+          </div>
+
+          <div className="mt-6">
             <Card title="Analytics Overview">
               <StatsEditor draft={draft} onChange={handleUpdate} />
             </Card>
           </div>
-        </aside>
+        </div>
       </main>
     </div>
   );

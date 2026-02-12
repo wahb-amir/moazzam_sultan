@@ -66,9 +66,9 @@
     "resumeAction": { "text": "Resume", "href": "/resume.pdf" },
     "stats": [
       { "icon": "Award", "value": "4+", "label": "Years Experience" },
-      { "icon": "Calendar", "value": "200+", "label": "Lessons Delivered" },
-      { "icon": "Clock", "value": "100%", "label": "On-time" },
-      { "icon": "Youtube", "value": "300+", "label": "Video Tutorials" }
+      { "icon": "Calendar", "value": "100+", "label": "Lessons Delivered" },
+      { "icon": "Clock", "value": "98%", "label": "On-time" },
+      { "icon": "Youtube", "value": "22+", "label": "Video Tutorials" }
     ]
   },
 

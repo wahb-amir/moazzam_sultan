@@ -40,7 +40,7 @@ export async function POST(req) {
 
     // 6. Create Tokens & Session Record
     const payload = { id: user._id, role: user.role };
-    const accessToken = jwt.sign(payload, accessSecret, { expiresIn: "15m" });
+    const accessToken = jwt.sign(payload, accessSecret, { expiresIn: "2h" });
     const refreshToken = jwt.sign(payload, refreshSecret, { expiresIn: "1d" });
 
     const newSession = await Session.create({
@@ -76,7 +76,7 @@ export async function POST(req) {
       path: "/",
     };
 
-    response.cookies.set("access_token", accessToken, { ...cookieOpts, maxAge: 900 });
+    response.cookies.set("access_token", accessToken, { ...cookieOpts, maxAge: 7200 });
     response.cookies.set("refresh_token", refreshToken, { ...cookieOpts, maxAge: 86400 });
     
     // Store session ID in a non-httpOnly cookie if you need to track it on client

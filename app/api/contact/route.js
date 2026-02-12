@@ -85,7 +85,7 @@ export async function POST(request) {
 
       return transporter.sendMail({
         from: `"${esc(name)}" <${process.env.SMTP_USER}>`,
-        to: "op422010@gmail.com",
+        to: "sultanmoazzam3@gmail.com",
         replyTo: email,
         subject: `New Message: ${name}`,
         html: generateTemplate({

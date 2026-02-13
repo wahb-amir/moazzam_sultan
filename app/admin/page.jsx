@@ -6,7 +6,7 @@ import {
   Clock, AlertCircle, CheckCircle2, MoreHorizontal,
   TriangleAlert, Loader2
 } from 'lucide-react';
-import { useAuth } from '../providers/AuthProvider';
+import { juseAuth } from '../providers/AuthProvider';
 import {useRouter} from 'next/navigation';
 const AdminContactView = () => {
   const [data, setData] = useState([]);

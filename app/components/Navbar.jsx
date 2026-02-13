@@ -1,59 +1,52 @@
-// src/components/Navbar.jsx
-'use client'
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ArrowRight } from 'lucide-react';
-import { SOCIAL_LINKS } from '../data';
+"use client";
 
-const Navbar = () => {
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, ArrowRight, MessageCircle } from "lucide-react";
+import { SOCIAL_LINKS } from "../data";
+
+const THEME_PALETTES = {
+  gold: {
+    primary: "#1e3a8a", // Deep Blue (Logo/Links)
+    buttonBg: "#2563eb", // Lighter Electric Blue (Pop Button)
+    accent: "#f59e0b",   // Pop Gold
+    softBg: "#fef3c7",
+  },
+  coral: {
+    primary: "#0f172a", 
+    buttonBg: "#f43f5e", 
+    accent: "#fb7185",
+    softBg: "#ffe4e6",
+  },
+  mint: {
+    primary: "#134e4a",
+    buttonBg: "#10b981",
+    accent: "#34d399",
+    softBg: "#ecfdf5",
+  },
+};
+
+const Navbar = ({ theme = "gold" }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false); // you can use for shrink effects later
-  const [isDesktop, setIsDesktop] = useState(
-    typeof window !== 'undefined' ? window.innerWidth >= 1100 : false
-  );
+  const [scrolled, setScrolled] = useState(false);
+  const palette = THEME_PALETTES[theme] || THEME_PALETTES.gold;
 
-  // initial check + listeners
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
-    const handleResize = () => setIsDesktop(window.innerWidth >= 1100);
-    handleResize();
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleResize);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // prevent body scroll when mobile menu is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
-  }, [isOpen]);
-
-  // Smooth Scroll Function
   const scrollToSection = (e, href) => {
     e.preventDefault();
-    const targetId = href.replace('#', '');
+    const targetId = href.replace("#", "");
     const elem = document.getElementById(targetId);
-
     if (elem) {
-      const offset = 80; // Height of the navbar (adjust if you change header height)
-      const elementPosition = elem.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
-
       window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth"
+        top: elem.getBoundingClientRect().top + window.pageYOffset - 80,
+        behavior: "smooth",
       });
-      setIsOpen(false); // Close mobile menu after clicking
+      setIsOpen(false);
     }
   };
 
@@ -61,125 +54,131 @@ const Navbar = () => {
     { name: "Home", href: "#hero" },
     { name: "About", href: "#about" },
     { name: "Portfolio", href: "#portfolio" },
-    { name: "Testimonials", href: "#testimonials" },
     { name: "Contact", href: "#contact" },
   ];
 
+  const isSolid = scrolled || isOpen;
+  const textColor = isSolid ? palette.primary : "#ffffff"; 
+  const borderColor = isSolid ? "border-slate-200" : "border-white/20";
+
   return (
     <header
-      // ALWAYS white background now; stays white across the whole page
-      className="fixed top-0 left-0 w-full z-[9999] bg-white shadow-md transition-all duration-300"
+      className={`fixed top-0 left-0 w-full z-[9999] transition-all duration-500 ease-in-out ${
+        isSolid 
+          ? "bg-white shadow-lg py-3" 
+          : "bg-transparent py-6"
+      }`}
     >
-      <div className="container mx-auto px-6 flex justify-between items-center py-3">
-        {/* Logo (always dark since bg is white) */}
+      <div className="container mx-auto px-6 flex justify-between items-center">
+        {/* Logo */}
         <a
           href="#hero"
-          onClick={(e) => scrollToSection(e, '#hero')}
-          className="text-2xl font-black tracking-tighter text-slate-900"
+          onClick={(e) => scrollToSection(e, "#hero")}
+          className="text-2xl font-black tracking-tighter transition-colors duration-500"
+          style={{ color: textColor }}
         >
-          MOAZZAM<span className="text-blue-600">.</span>
+          MOAZZAM<span style={{ color: palette.accent }}>.</span>
         </a>
 
-        {/* Desktop Nav — controlled by isDesktop (breakpoint: 1200px) */}
-        {isDesktop ? (
-          <div className="flex items-center gap-1">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                onClick={(e) => scrollToSection(e, link.href)}
-                className="px-4 py-2 text-sm font-bold transition-all duration-200 rounded-full text-slate-600 hover:text-blue-600 hover:bg-blue-50/50"
-              >
-                {link.name}
-              </a>
-            ))}
-            <div className="ml-4 pl-4 border-l border-slate-200/20">
-              <a
-                href={SOCIAL_LINKS.whatsapp}
-                target="_blank"
-                rel="noreferrer"
-                className="px-6 py-2.5 rounded-full text-sm font-bold bg-blue-600 text-white shadow-lg hover:bg-blue-700"
-              >
-                Book Trial
-              </a>
-            </div>
-          </div>
-        ) : (
-          // Mobile Toggle shown when width < 1200px
-          <button
-            className="p-2 rounded-xl transition-colors"
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label={isOpen ? 'Close menu' : 'Open menu'}
-          >
-            {isOpen ? (
-              <X className="text-slate-900" size={28} />
-            ) : (
-              <Menu className="text-slate-900" size={28} />
-            )}
-          </button>
-        )}
-
-        {/* Mobile Menu Overlay (renders only when isDesktop === false and isOpen === true) */}
-        <AnimatePresence>
-          {!isDesktop && isOpen && (
-            <>
-              {/* Dark Backdrop */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setIsOpen(false)}
-                className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40"
+        {/* Desktop Navigation */}
+        <nav className="hidden lg:flex items-center gap-1">
+          {navLinks.map((link) => (
+            <a
+              key={link.name}
+              href={link.href}
+              onClick={(e) => scrollToSection(e, link.href)}
+              className="px-5 py-2 text-sm font-bold rounded-full transition-all relative group"
+              style={{ color: textColor }}
+            >
+              {link.name}
+              <span 
+                className="absolute bottom-1 left-1/2 w-0 h-0.5 transition-all duration-300 group-hover:w-1/2 group-hover:left-1/4"
+                style={{ backgroundColor: palette.accent }}
               />
+            </a>
+          ))}
 
-              {/* Slide-in Menu */}
-              <motion.div
-                initial={{ x: '100%' }}
-                animate={{ x: 0 }}
-                exit={{ x: '100%' }}
-                transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="fixed top-0 right-0 h-full w-[80%] max-w-sm bg-white z-50 shadow-2xl p-8 flex flex-col"
-              >
-                <div className="flex justify-between items-center mb-12">
-                  <span className="text-xl font-black text-slate-900">NAVIGATION</span>
-                  <button onClick={() => setIsOpen(false)} className="p-2 bg-slate-50 rounded-full" aria-label="Close menu">
-                    <X size={20} />
-                  </button>
-                </div>
+          <div className={`ml-4 pl-6 border-l transition-colors duration-500 ${borderColor}`}>
+            <motion.a
+              whileHover={{ 
+                scale: 1.05, 
+                backgroundColor: "#1d4ed8", // Slightly darker on hover
+                boxShadow: `0 10px 25px -5px ${palette.buttonBg}60` 
+              }}
+              whileTap={{ scale: 0.95 }}
+              href={SOCIAL_LINKS?.whatsapp || "#"}
+              target="_blank"
+              className="px-8 py-3 rounded-full text-sm font-black text-white shadow-xl flex items-center gap-2 transition-all duration-300"
+              style={{ 
+                backgroundColor: palette.buttonBg, // Lighter, popping blue
+              }}
+            >
+              Book Trial
+              <ArrowRight size={16} />
+            </motion.a>
+          </div>
+        </nav>
 
-                <div className="flex flex-col space-y-4">
-                  {navLinks.map((link, i) => (
-                    <motion.a
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.08 }}
-                      key={link.name}
-                      href={link.href}
-                      onClick={(e) => scrollToSection(e, link.href)}
-                      className="flex items-center justify-between text-2xl font-bold text-slate-800 hover:text-blue-600 py-2 border-b border-slate-50"
-                    >
-                      {link.name}
-                      <ArrowRight size={20} className="text-slate-300" />
-                    </motion.a>
-                  ))}
-                </div>
-
-                <div className="mt-auto pt-10">
-                  <a
-                    href={SOCIAL_LINKS.whatsapp}
-                    className="w-full flex items-center justify-center gap-2 py-4 bg-blue-600 text-white text-lg font-bold rounded-2xl shadow-xl"
-                  >
-                    Book Free Demo
-                  </a>
-                  <p className="text-center text-slate-400 text-sm mt-6 font-medium">
-                    Available for O/A Levels & Punjab Board
-                  </p>
-                </div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
+        {/* Mobile Toggle Button */}
+        <button
+          className="lg:hidden p-2 rounded-xl transition-all z-[10000]"
+          onClick={() => setIsOpen(!isOpen)}
+          style={{ color: textColor }}
+        >
+          {isOpen ? <X size={28} /> : <Menu size={28} />}
+        </button>
       </div>
+
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpen(false)}
+              className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9998] lg:hidden"
+            />
+
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed top-0 right-0 h-full w-[85%] max-w-sm bg-white z-[9999] shadow-2xl p-8 pt-24 flex flex-col lg:hidden"
+            >
+              <div className="flex flex-col space-y-1">
+                {navLinks.map((link, i) => (
+                  <motion.a
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    key={link.name}
+                    href={link.href}
+                    onClick={(e) => scrollToSection(e, link.href)}
+                    className="flex items-center justify-between text-3xl font-black py-4 border-b border-slate-50"
+                    style={{ color: palette.primary }}
+                  >
+                    {link.name}
+                    <ArrowRight size={24} style={{ color: palette.accent }} />
+                  </motion.a>
+                ))}
+              </div>
+
+              <div className="mt-auto">
+                <a
+                  href={SOCIAL_LINKS?.whatsapp || "#"}
+                  className="w-full flex items-center justify-center gap-3 py-5 text-white text-xl font-black rounded-2xl shadow-xl transition-transform active:scale-95"
+                  style={{ backgroundColor: palette.buttonBg }}
+                >
+                  <MessageCircle size={24} fill="white" />
+                  Book Free Demo
+                </a>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </header>
   );
 };

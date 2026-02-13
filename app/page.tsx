@@ -7,7 +7,7 @@ import Portfolio from "./components/Portfolio";
 import Testimonials from "./components/Testimonials";
 import Contact from "./components/Contact";
 import DATA from "@/data.json";
-
+import Footer from "./components/Footer";
 const App = () => {
   return (
     <div className="bg-white min-h-screen font-sans text-slate-900 selection:bg-blue-100 selection:text-blue-900">
@@ -38,6 +38,7 @@ const App = () => {
       />
       <Testimonials testimonials={DATA.testimonials} />
       <Contact socialLinks={DATA.socialLinks} />
+      <Footer  />
     </div>
   );
 };

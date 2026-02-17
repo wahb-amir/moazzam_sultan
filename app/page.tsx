@@ -77,12 +77,30 @@ export default function UnpaidInvoicePage() {
 
         {/* The "Fun" but Direct Message */}
         <div className="space-y-4 text-gray-600 mb-8">
-          <p className="text-lg">
-            This application has entered <span className="font-semibold text-gray-900">"Hibernation Mode"</span> due to an outstanding balance.
+          <p className="text-lg font-bold">
+           This application is currently in “Hibernation Mode”… our devs went unpaid and the coffee ran out. ☕💤
           </p>
-          <p>
+          <div className="flex flex-col items-center justify-center mt-6 space-y-2 relative">
+  {/* Coffee cup SVG */}
+  <svg className="w-16 h-16 animate-bounce-slow" viewBox="0 0 64 64" fill="none">
+    <rect x="18" y="24" width="28" height="24" rx="4" fill="#C27856"/>
+    <path d="M46 28h4a4 4 0 0 1 0 8h-4" stroke="#8B5E3C" strokeWidth="2"/>
+    <path d="M28 20c0-4 8-4 8 0" stroke="#F3E5AB" strokeWidth="2" strokeLinecap="round"/>
+  </svg>
+
+  {/* Speech bubble */}
+  <div className="relative bg-white/90 backdrop-blur-md p-3 rounded-xl shadow-lg text-center text-gray-800 font-medium animate-pulse">
+    We love building great software… ☕  
+    <br />but food, shelter & coffee are kinda important 😅
+    {/* Small confetti around bubble */}
+    <span className="absolute top-0 left-0 w-2 h-2 bg-yellow-400 rounded-full animate-bounce-slow"></span>
+    <span className="absolute top-0 right-0 w-2 h-2 bg-pink-400 rounded-full animate-bounce-slow delay-200"></span>
+    <span className="absolute bottom-0 left-1/2 w-2 h-2 bg-blue-400 rounded-full animate-bounce-slow delay-400"></span>
+  </div>
+</div>
+          {/* <p>
             We love building great software, but our developers also enjoy things like food, shelter, and coffee.
-          </p>
+          </p> */}
           <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-left rounded-r-md">
             <div className="flex">
               <div className="flex-shrink-0">

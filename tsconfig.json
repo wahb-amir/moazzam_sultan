@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "app/api/auth/magic-link/route.js", "app/admin/update.jsx"  ],
+, "app/api/auth/magic-link/route.js", "app/admin/update.jsx", "app/page.jsx"  ],
   "exclude": ["node_modules"]
 }
